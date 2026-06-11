@@ -379,6 +379,63 @@
     root.append(backdrop);
   }
 
+  // ---------- editor code reset ----------
+
+  // When you open a deck card for review, the editor is reset to the blank
+  // template via LeetCode's own toolbar reset button (plus the Confirm in
+  // the dialog it opens) — real recall, Anki-style, no peeking at your old
+  // solution.
+  //
+  // Guard rails: only deck cards that are actually reviewable (due today,
+  // overdue, or in the new queue), and at most once per problem per day —
+  // so navigating away and back mid-solve never wipes work in progress.
+  let pendingResetSlug = null;
+
+  function resetMarkerKey(slug) {
+    return `leetcode-anki-reset:${slug}`;
+  }
+
+  async function queueDraftReset(slug) {
+    try {
+      if (localStorage.getItem(resetMarkerKey(slug)) === SM2.today()) return;
+      const { deck, settings } = await store.load();
+      const card = deck[slug];
+      const reviewable = card && (card.dueDate == null || card.dueDate <= SM2.today());
+      if (!reviewable || settings.resetCode === false) return;
+      pendingResetSlug = slug;
+    } catch {
+      // storage unavailable — skip
+    }
+  }
+
+  // Runs on every DOM settle until the editor toolbar exists (it mounts
+  // well after navigation), then clicks reset and confirms the dialog.
+  function attemptDraftReset() {
+    const slug = slugFromPath();
+    if (!pendingResetSlug || pendingResetSlug !== slug) return;
+    const resetBtn = Selectors.findEditorResetButton();
+    if (!resetBtn) return; // editor not mounted yet — retry next settle
+
+    pendingResetSlug = null;
+    resetBtn.click();
+
+    let tries = 0;
+    const timer = setInterval(() => {
+      const confirm = Selectors.findDialogConfirmButton();
+      if (confirm) confirm.click();
+      // Stop once confirmed, or after ~3s if no dialog ever appeared
+      // (LeetCode skips it when the editor is already pristine).
+      if (confirm || ++tries > 20) {
+        clearInterval(timer);
+        try {
+          localStorage.setItem(resetMarkerKey(slug), SM2.today());
+        } catch {
+          // marker is best-effort
+        }
+      }
+    }, 150);
+  }
+
   // ---------- accepted detection ----------
 
   let verdictWasVisible = false;
@@ -418,6 +475,7 @@
         verdictWasVisible = false;
         removeOverlay();
         renderPill();
+        if (slug) queueDraftReset(slug);
       }
     }
     if (slug) {
@@ -430,6 +488,7 @@
       ) {
         renderPill();
       }
+      attemptDraftReset();
       checkVerdict();
     }
   }
@@ -442,4 +501,5 @@
 
   store.onChange(() => renderPill());
   renderPill();
+  if (lastSlug) queueDraftReset(lastSlug);
 })();
