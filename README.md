@@ -45,6 +45,30 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
    is scheduled. The problemset card updates to the next due problem, or
    "all caught up".
 
+## Releasing
+
+`npm run package` runs the full test suite and then builds
+`leetcode-anki-<version>.zip` (a red test blocks the package). The zip
+contains exactly what the manifest references — `manifest.json` at the root,
+`content/`, `lib/`, `popup/`, and the four icon PNGs. Tests, docs, configs,
+the icon-source SVG, and `node_modules` are excluded; built zips are
+gitignored.
+
+Notes:
+
+- **Installing from the zip** — Chrome doesn't load zips directly for
+  personal use: either keep using Load Unpacked on this folder, or upload the
+  zip to the Chrome Web Store developer dashboard ($5 one-time registration),
+  where it can be published unlisted/private.
+- **Web Store review** — expect pushback on the name "Leetcode Anki" (two
+  third-party trademarks), and have a justification ready for the
+  `leetcode.com` host permission. Unlisted listings get the same review as
+  public ones.
+- **Version bumps** — update `version` in both `manifest.json` and
+  `package.json` (keep them in sync); the zip name picks up the version
+  automatically.
+- Store listing copy lives in [`STORE.md`](STORE.md).
+
 ## Run the tests
 
 ```sh
