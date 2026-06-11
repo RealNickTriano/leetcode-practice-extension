@@ -1,0 +1,12 @@
+{
+  "name": "leetcode-anki",
+  "version": "0.1.0",
+  "description": "Spaced-repetition practice for LeetCode — Anki, but the cards are problems.",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.1"
+  }
+}

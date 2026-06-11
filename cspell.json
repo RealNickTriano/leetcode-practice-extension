@@ -1,0 +1,20 @@
+{
+  "version": "0.2",
+  "words": [
+    "Anki",
+    "Consolas",
+    "cooldown",
+    "Fraunces",
+    "FSRS",
+    "inorder",
+    "koko",
+    "leetcode",
+    "leetcode-anki",
+    "Menlo",
+    "Neetcode",
+    "powx",
+    "preorder",
+    "problemset"
+  ],
+  "ignorePaths": ["PLAN.html"]
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="popup.css">
+<title>Leetcode Anki</title>
+</head>
+<body>
+
+<header>
+  <span class="brand"><img src="../icons/icon32.png" alt="" width="16" height="16">Leetcode Anki</span>
+  <span class="counts" id="counts"></span>
+</header>
+
+<div class="deckbar">
+  <select id="deck-select" aria-label="Selected deck"></select>
+  <button id="deck-new" title="New deck">+ new</button>
+  <button id="deck-del" title="Delete this deck">delete</button>
+</div>
+
+<div class="newdeck hidden" id="newdeck-row">
+  <input id="newdeck-name" placeholder="deck name…" maxlength="40">
+  <button id="newdeck-create">create</button>
+</div>
+
+<main id="list" aria-label="Deck"></main>
+
+<script src="../lib/sm2.js"></script>
+<script src="../lib/select.js"></script>
+<script src="../lib/store.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

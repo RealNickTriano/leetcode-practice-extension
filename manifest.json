@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Leetcode Anki",
+  "version": "0.1.0",
+  "description": "Spaced-repetition practice for LeetCode — Anki, but the cards are problems.",
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Leetcode Anki",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/icon16.png", "icons/icon32.png"],
+      "matches": ["https://leetcode.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": [
+        "lib/sm2.js",
+        "lib/select.js",
+        "lib/store.js",
+        "lib/selectors.js",
+        "lib/lists.js",
+        "lib/api.js",
+        "content/problemset.js",
+        "content/problem.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

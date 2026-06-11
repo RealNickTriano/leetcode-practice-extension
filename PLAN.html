@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeetLoop — Project Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f6f1e6;
+  --paper-deep: #efe8d8;
+  --ink: #211c14;
+  --ink-soft: #5b5344;
+  --ink-faint: #8c8270;
+  --grid: rgba(33, 28, 20, 0.055);
+  --accent: #e8930c;
+  --accent-deep: #b86f03;
+  --accent-wash: rgba(232, 147, 12, 0.12);
+  --easy: #2db55d;
+  --medium: #d4a017;
+  --hard: #e0443e;
+  --card: #fffdf7;
+  --dark: #1c1a17;
+  --dark-2: #262320;
+  --dark-line: #3a362f;
+  --dark-text: #e8e2d6;
+  --dark-faint: #8a8478;
+  --rule: rgba(33, 28, 20, 0.16);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  position: relative;
+}
+
+/* red drafting margin line */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; bottom: 0;
+  left: clamp(16px, 5vw, 72px);
+  width: 1px;
+  background: rgba(224, 68, 62, 0.28);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* grain */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.sheet {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 7vw, 96px) 120px;
+  position: relative;
+  z-index: 1;
+}
+
+.mono {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* ============ HEADER ============ */
+header {
+  padding-top: 64px;
+  padding-bottom: 56px;
+  border-bottom: 2px solid var(--ink);
+  position: relative;
+}
+
+.doc-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 48px;
+}
+
+.doc-meta .stamp {
+  border: 1.5px solid var(--accent-deep);
+  color: var(--accent-deep);
+  padding: 2px 10px;
+  transform: rotate(-2deg);
+  font-weight: 600;
+}
+
+h1 {
+  font-family: "Fraunces", serif;
+  font-weight: 900;
+  font-size: clamp(56px, 11vw, 124px);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+
+h1 .loop {
+  color: var(--accent);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(20px, 3.4vw, 30px);
+  color: var(--ink-soft);
+  max-width: 30ch;
+  margin-top: 20px;
+  line-height: 1.3;
+}
+
+.header-equation {
+  margin-top: 40px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.header-equation .term {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  padding: 6px 14px;
+  box-shadow: 2px 2px 0 rgba(33,28,20,0.1);
+}
+
+.header-equation .op {
+  font-size: 16px;
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+/* ============ NAV ============ */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(246, 241, 230, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(-1 * clamp(20px, 7vw, 96px));
+  padding: 0 clamp(20px, 7vw, 96px);
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav ul::-webkit-scrollbar { display: none; }
+
+nav a {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 13px 14px;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+nav a:hover {
+  color: var(--accent-deep);
+  border-bottom-color: var(--accent);
+}
+
+/* ============ SECTIONS ============ */
+section {
+  padding-top: 88px;
+}
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 18px;
+}
+
+.sec-num {
+  font-family: "Fraunces", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(44px, 7vw, 72px);
+  line-height: 1;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+h2 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: clamp(28px, 4.6vw, 44px);
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+.sec-label {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+
+h3 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 23px;
+  margin: 44px 0 14px;
+  letter-spacing: -0.01em;
+}
+
+p { margin-bottom: 18px; max-width: 68ch; }
+p strong { font-weight: 600; }
+
+.lede {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 58ch;
+}
+
+em { font-family: "Newsreader", serif; }
+
+ul.plain {
+  list-style: none;
+  margin: 0 0 20px;
+  max-width: 68ch;
+}
+
+ul.plain li {
+  padding: 10px 0 10px 30px;
+  position: relative;
+  border-bottom: 1px dashed var(--rule);
+}
+
+ul.plain li::before {
+  content: "→";
+  position: absolute;
+  left: 2px;
+  color: var(--accent-deep);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* annotation in margin style */
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-wash);
+  padding: 14px 18px;
+  font-size: 16px;
+  max-width: 66ch;
+  margin: 24px 0;
+}
+
+.note .mono { font-size: 13px; color: var(--accent-deep); display: block; margin-bottom: 4px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+
+/* ============ BROWSER MOCKUP ============ */
+.browser {
+  background: var(--dark);
+  border-radius: 10px;
+  box-shadow: 0 24px 60px -18px rgba(33,28,20,0.45), 0 4px 14px rgba(33,28,20,0.18);
+  overflow: hidden;
+  margin: 36px 0 12px;
+  border: 1px solid var(--dark-line);
+}
+
+.browser-chrome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--dark-2);
+  border-bottom: 1px solid var(--dark-line);
+}
+
+.b-dot { width: 11px; height: 11px; border-radius: 50%; background: #4a463f; }
+.b-dot:nth-child(1){ background:#d8584f; } .b-dot:nth-child(2){ background:#d8a23f; } .b-dot:nth-child(3){ background:#56a85e; }
+
+.b-url {
+  flex: 1;
+  margin-left: 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+  color: var(--dark-faint);
+  background: var(--dark);
+  border: 1px solid var(--dark-line);
+  border-radius: 5px;
+  padding: 5px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.b-url .hl { color: #c9c2b2; }
+
+.browser-body { padding: 22px 24px 26px; }
+
+.lc-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.lc-pill {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  color: var(--dark-faint);
+  border: 1px solid var(--dark-line);
+  border-radius: 99px;
+  padding: 4px 12px;
+}
+
+/* injected review card */
+.review-card {
+  border: 1px solid rgba(232, 147, 12, 0.55);
+  background: linear-gradient(135deg, rgba(232,147,12,0.13), rgba(232,147,12,0.04) 60%);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  position: relative;
+  animation: cardGlow 3.2s ease-in-out infinite;
+}
+
+@keyframes cardGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232,147,12,0.0); }
+  50% { box-shadow: 0 0 26px -4px rgba(232,147,12,0.35); }
+}
+
+.rc-tag {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #1c1208;
+  padding: 3px 10px;
+  border-radius: 3px;
+}
+
+.rc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.rc-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #f2ecdf;
+}
+
+.rc-title .num { color: var(--dark-faint); }
+
+.rc-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+}
+
+.diff { font-weight: 600; }
+.diff.e { color: var(--easy); } .diff.m { color: #ffb800; } .diff.h { color: #ff6b66; }
+
+.rc-due { color: var(--dark-faint); }
+.rc-due b { color: #ffb858; font-weight: 600; }
+
+.rc-sub {
+  margin-top: 9px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  color: var(--dark-faint);
+}
+.rc-sub .chip {
+  display: inline-block;
+  border: 1px solid var(--dark-line);
+  border-radius: 99px;
+  padding: 1px 9px;
+  margin-right: 6px;
+  color: #b5ad9d;
+}
+
+/* normal table rows under it */
+.lc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  border-bottom: 1px solid rgba(58,54,47,0.6);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px;
+  color: #a39b89;
+}
+.lc-row:last-child { border-bottom: none; }
+.lc-row .check { color: var(--easy); margin-right: 10px; }
+.lc-row .nocheck { color: transparent; margin-right: 10px; }
+.lc-row.faded { opacity: 0.55; }
+
+.figcap {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin: 10px 0 0 4px;
+  letter-spacing: 0.04em;
+}
+.figcap::before { content: "fig. "; color: var(--accent-deep); font-weight: 600; }
+
+/* ============ RATING BAR MOCK ============ */
+.rating-mock {
+  background: var(--dark);
+  border: 1px solid var(--dark-line);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin: 36px 0 12px;
+  box-shadow: 0 18px 44px -16px rgba(33,28,20,0.4);
+}
+
+.rm-accepted {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--easy);
+  margin-bottom: 6px;
+}
+
+.rm-q {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--dark-faint);
+  margin-bottom: 18px;
+}
+
+.rm-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.rm-btn {
+  border-radius: 7px;
+  padding: 10px 6px;
+  text-align: center;
+  font-family: "IBM Plex Mono", monospace;
+  cursor: pointer;
+  border: 1px solid var(--dark-line);
+  background: var(--dark-2);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.rm-btn:hover { transform: translateY(-3px); }
+
+.rm-btn .k { display: block; font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.rm-btn .v { display: block; font-size: 10px; color: var(--dark-faint); }
+
+.rm-btn.again .k { color: #ff6b66; } .rm-btn.again:hover { border-color: #ff6b66; }
+.rm-btn.hard .k { color: #ffb800; } .rm-btn.hard:hover { border-color: #ffb800; }
+.rm-btn.good .k { color: #6ecf85; } .rm-btn.good:hover { border-color: #6ecf85; }
+.rm-btn.easy .k { color: #5ab8ff; } .rm-btn.easy:hover { border-color: #5ab8ff; }
+
+/* ============ INTERVAL TIMELINE ============ */
+.timeline {
+  margin: 44px 0 8px;
+  padding: 36px 8px 8px;
+  position: relative;
+}
+
+.tl-track {
+  position: relative;
+  height: 2px;
+  background: var(--ink);
+  margin: 0 10px;
+}
+
+.tl-stop {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tl-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  margin: 0 auto;
+  transition: transform 0.2s, background 0.2s;
+}
+.tl-stop:hover .tl-dot { background: var(--accent); transform: scale(1.25); }
+
+.tl-stop .d {
+  position: absolute;
+  top: -34px; left: 50%;
+  transform: translateX(-50%);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--accent-deep);
+}
+
+.tl-stop .lbl {
+  position: absolute;
+  top: 18px; left: 50%;
+  transform: translateX(-50%);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.tl-arrow {
+  position: absolute;
+  right: -4px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--ink);
+}
+
+/* ============ ALGO TABLE ============ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 15.5px;
+  background: var(--card);
+  box-shadow: 3px 3px 0 rgba(33,28,20,0.12);
+  border: 1px solid var(--rule);
+}
+
+th {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ink-soft);
+  background: var(--paper-deep);
+  padding: 11px 16px;
+  border-bottom: 2px solid var(--ink);
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+tr:last-child td { border-bottom: none; }
+
+td .mono { font-size: 13.5px; }
+
+.grade { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 13.5px; }
+.grade.again { color: var(--hard); }
+.grade.hard { color: #b08000; }
+.grade.good { color: var(--easy); }
+.grade.easy { color: #2a7fc9; }
+
+/* ============ ARCHITECTURE DIAGRAM ============ */
+.arch {
+  margin: 40px 0 12px;
+  display: grid;
+  grid-template-columns: 1fr 56px 1fr 56px 1fr;
+  align-items: stretch;
+  gap: 14px 0;
+}
+
+.arch-box {
+  background: var(--card);
+  border: 1.5px solid var(--ink);
+  box-shadow: 4px 4px 0 rgba(33,28,20,0.14);
+  padding: 18px 18px 16px;
+  position: relative;
+}
+
+.arch-box.accent { border-color: var(--accent-deep); box-shadow: 4px 4px 0 var(--accent-wash), 4px 4px 0 rgba(232,147,12,0.3); }
+
+.arch-box .t {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+.arch-box.accent .t { color: var(--accent-deep); }
+
+.arch-box .d {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.arch-box .file {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  background: var(--paper-deep);
+  border: 1px solid var(--rule);
+  padding: 2px 8px;
+  color: var(--ink-soft);
+}
+
+.arch-conn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.arch-conn::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  border-top: 1.5px dashed var(--ink-faint);
+}
+
+.arch-conn span {
+  position: relative;
+  background: var(--paper);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--accent-deep);
+  padding: 2px 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.arch-row2 {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+@media (max-width: 720px) {
+  .arch { grid-template-columns: 1fr; }
+  .arch-conn { min-height: 40px; }
+  .arch-conn::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: none; border-left: 1.5px dashed var(--ink-faint); }
+  .arch-row2 { grid-template-columns: 1fr; }
+  .rm-buttons { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============ CODE ============ */
+pre {
+  background: var(--dark);
+  color: var(--dark-text);
+  border-radius: 8px;
+  border: 1px solid var(--dark-line);
+  padding: 22px 24px;
+  overflow-x: auto;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 24px 0;
+  box-shadow: 0 14px 36px -16px rgba(33,28,20,0.4);
+}
+
+code { font-family: "IBM Plex Mono", monospace; }
+
+p code, li code, td code {
+  background: var(--paper-deep);
+  border: 1px solid var(--rule);
+  padding: 1px 6px;
+  font-size: 14px;
+  color: var(--accent-deep);
+}
+
+.c-key { color: #ffb858; }
+.c-str { color: #9ecf85; }
+.c-num { color: #5ab8ff; }
+.c-com { color: #79715f; font-style: italic; }
+.c-punc { color: #8a8478; }
+
+/* ============ PHASES ============ */
+.phases { margin-top: 40px; }
+
+.phase {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 0 32px;
+  padding: 30px 0;
+  border-top: 1px solid var(--rule);
+  position: relative;
+}
+
+.phase:last-child { border-bottom: 1px solid var(--rule); }
+
+.phase-num {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 52px;
+  line-height: 1;
+  color: var(--ink-faint);
+  transition: color 0.25s;
+}
+
+.phase:hover .phase-num { color: var(--accent); }
+
+.phase-body h3 { margin: 4px 0 6px; }
+
+.phase-goal {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.checklist {
+  list-style: none;
+  margin-top: 14px;
+}
+
+.checklist li {
+  position: relative;
+  padding: 6px 0 6px 32px;
+  font-size: 16.5px;
+  color: var(--ink-soft);
+}
+
+.checklist li::before {
+  content: "";
+  position: absolute;
+  left: 2px; top: 10px;
+  width: 13px; height: 13px;
+  border: 1.5px solid var(--ink-soft);
+  background: var(--card);
+}
+
+@media (max-width: 620px) {
+  .phase { grid-template-columns: 1fr; gap: 8px; }
+  .phase-num { font-size: 36px; }
+}
+
+/* ============ RISKS ============ */
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.risk {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--hard);
+  padding: 18px 20px;
+  box-shadow: 3px 3px 0 rgba(33,28,20,0.1);
+}
+
+.risk .t {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.risk p { font-size: 15px; margin-bottom: 0; color: var(--ink-soft); }
+.risk .mit { margin-top: 10px; font-size: 14px; }
+.risk .mit b {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--easy);
+  font-weight: 600;
+}
+
+/* ============ FOOTER ============ */
+footer {
+  margin-top: 110px;
+  padding-top: 28px;
+  border-top: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ============ REVEAL ============ */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.in { opacity: 1; transform: none; }
+
+header .reveal { transition-delay: var(--dl, 0s); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .review-card { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+<header>
+  <div class="doc-meta reveal" style="--dl:0s">
+    <span>Doc № 001 — Technical Plan</span>
+    <span class="stamp">Draft v0.1</span>
+    <span>June 2026</span>
+  </div>
+  <h1 class="reveal" style="--dl:0.08s">Leet<span class="loop">Loop</span></h1>
+  <p class="subtitle reveal" style="--dl:0.16s">A browser extension that turns LeetCode into a spaced-repetition deck — Anki, but the cards are problems.</p>
+  <div class="header-equation reveal mono" style="--dl:0.24s">
+    <span class="term">your solve history</span>
+    <span class="op">+</span>
+    <span class="term">SM-2 scheduling</span>
+    <span class="op">=</span>
+    <span class="term" style="border-color: var(--accent-deep); color: var(--accent-deep); font-weight:600;">the one problem to do today</span>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#concept">01 Concept</a></li>
+    <li><a href="#ux">02 What You See</a></li>
+    <li><a href="#engine">03 The Engine</a></li>
+    <li><a href="#arch">04 Architecture</a></li>
+    <li><a href="#data">05 Data Model</a></li>
+    <li><a href="#roadmap">06 Roadmap</a></li>
+    <li><a href="#risks">07 Risks</a></li>
+  </ul>
+</nav>
+
+<!-- ================= 01 CONCEPT ================= -->
+<section id="concept" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <div>
+      <span class="sec-label">The Idea</span>
+      <h2>Concept</h2>
+    </div>
+  </div>
+
+  <p class="lede">You forget solutions on a curve. The extension schedules each problem to come back right before you'd forget it — so every repeat costs the minimum time for the maximum retention.</p>
+
+  <p>Today, picking what to practice on LeetCode is guesswork: you re-solve things you already know, or you grind new problems while old patterns quietly decay. Anki solved this exact problem for flashcards decades ago with <strong>spaced repetition</strong>: rate how hard a recall was, and the algorithm pushes the next review out on an expanding schedule.</p>
+
+  <p>LeetLoop applies that loop to coding problems:</p>
+
+  <ul class="plain">
+    <li>Every problem you solve becomes a <strong>card</strong> with a review schedule.</li>
+    <li>When you visit <span class="mono" style="font-size:14px">leetcode.com/problemset/</span>, the extension injects a <strong>"Due Today"</strong> card pinned above the problem table — the single most overdue problem in your deck.</li>
+    <li>When you get an <strong>Accepted</strong> submission on a due problem, you rate the attempt (<em>Again / Hard / Good / Easy</em>), and the scheduler computes the next review date.</li>
+    <li>No solves due? The extension suggests a <strong>new problem</strong> from a curated list (e.g. NeetCode 150 order), so the deck grows steadily.</li>
+  </ul>
+
+  <div class="note">
+    <span class="mono">Design principle</span>
+    One problem per day, surfaced where you already are. No separate app, no dashboard to remember to open. The habit lives on the page you already visit.
+  </div>
+</section>
+
+<!-- ================= 02 UX ================= -->
+<section id="ux" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <div>
+      <span class="sec-label">User Experience</span>
+      <h2>What you see</h2>
+    </div>
+  </div>
+
+  <h3>A. The injected review card</h3>
+  <p>On the problems page, a content script waits for LeetCode's problem table to render, then inserts one card above it. It shows the due problem, why it's due, and your history with it. Clicking it opens the problem.</p>
+
+  <div class="browser">
+    <div class="browser-chrome">
+      <span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span>
+      <span class="b-url">https://<span class="hl">leetcode.com/problemset/</span></span>
+    </div>
+    <div class="browser-body">
+      <div class="lc-toolbar">
+        <span class="lc-pill">All Topics</span>
+        <span class="lc-pill">Algorithms</span>
+        <span class="lc-pill">Database</span>
+      </div>
+
+      <div class="review-card">
+        <span class="rc-tag">⟳ LeetLoop · Due Today</span>
+        <div class="rc-row">
+          <span class="rc-title"><span class="num">3.</span> Longest Substring Without Repeating Characters</span>
+          <span class="rc-meta">
+            <span class="diff m">Medium</span>
+            <span class="rc-due">due <b>today</b> · interval 6d</span>
+          </span>
+        </div>
+        <div class="rc-sub">
+          <span class="chip">sliding-window</span><span class="chip">hash-map</span>
+          last solved 2026-06-05 · 2 reviews · rated Good
+        </div>
+      </div>
+
+      <div class="lc-row"><span><span class="check">✓</span>1. Two Sum</span><span class="diff e">Easy</span></div>
+      <div class="lc-row faded"><span><span class="nocheck">✓</span>2. Add Two Numbers</span><span class="diff m">Med.</span></div>
+      <div class="lc-row faded"><span><span class="check">✓</span>4. Median of Two Sorted Arrays</span><span class="diff h">Hard</span></div>
+    </div>
+  </div>
+  <p class="figcap">1 — Review card injected above the native problem list.</p>
+
+  <h3>B. The rating prompt</h3>
+  <p>On the problem page itself, the extension watches for an <strong>Accepted</strong> verdict. When the due problem is accepted, a small overlay slides in asking for a self-grade — the only manual input the whole system needs. The intervals shown on each button are computed live from the card's current state.</p>
+
+  <div class="rating-mock">
+    <div class="rm-accepted">✓ Accepted — 52 ms, beats 91%</div>
+    <div class="rm-q">⟳ LeetLoop — how did that recall feel?</div>
+    <div class="rm-buttons">
+      <div class="rm-btn again"><span class="k">Again</span><span class="v">&lt; 1 day</span></div>
+      <div class="rm-btn hard"><span class="k">Hard</span><span class="v">~ 8 days</span></div>
+      <div class="rm-btn good"><span class="k">Good</span><span class="v">~ 15 days</span></div>
+      <div class="rm-btn easy"><span class="k">Easy</span><span class="v">~ 21 days</span></div>
+    </div>
+  </div>
+  <p class="figcap">2 — Post-accept rating overlay. One click, then it disappears.</p>
+
+  <h3>C. The popup (toolbar icon)</h3>
+  <p>A small popup for everything that doesn't belong on LeetCode's pages: deck stats (cards, due count, streak), a list of upcoming reviews, manual add/remove of problems, and JSON export/import of your deck.</p>
+</section>
+
+<!-- ================= 03 ENGINE ================= -->
+<section id="engine" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <div>
+      <span class="sec-label">Spaced Repetition</span>
+      <h2>The scheduling engine</h2>
+    </div>
+  </div>
+
+  <p class="lede">A direct adaptation of Anki's SM-2: each card carries an <em>ease factor</em> and an <em>interval</em>; your rating after each solve updates both.</p>
+
+  <div class="timeline">
+    <div class="tl-track">
+      <div class="tl-stop" style="left: 2%"><span class="d">Day 0</span><div class="tl-dot"></div><span class="lbl">first solve</span></div>
+      <div class="tl-stop" style="left: 10%"><span class="d">+1d</span><div class="tl-dot"></div><span class="lbl">review 1</span></div>
+      <div class="tl-stop" style="left: 24%"><span class="d">+6d</span><div class="tl-dot"></div><span class="lbl">review 2</span></div>
+      <div class="tl-stop" style="left: 48%"><span class="d">+15d</span><div class="tl-dot"></div><span class="lbl">review 3</span></div>
+      <div class="tl-stop" style="left: 86%"><span class="d">+37d</span><div class="tl-dot"></div><span class="lbl">review 4</span></div>
+      <span class="tl-arrow">→</span>
+    </div>
+  </div>
+  <p class="figcap" style="margin-top:28px">3 — Expanding intervals for a card rated "Good" every time (ease 2.5).</p>
+
+  <h3>The rules</h3>
+  <p>Each card stores <code>ease</code> (starts at 2.5), <code>interval</code> (days), and <code>reps</code> (consecutive successful reviews). After each rated solve:</p>
+
+  <table>
+    <thead>
+      <tr><th>Rating</th><th>Meaning</th><th>Next interval</th><th>Ease change</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="grade again">Again</span></td>
+        <td>Couldn't solve it, or needed the editorial</td>
+        <td><span class="mono">1 day</span> — reps reset to 0</td>
+        <td><span class="mono">−0.20</span> (floor 1.3)</td>
+      </tr>
+      <tr>
+        <td><span class="grade hard">Hard</span></td>
+        <td>Solved, but slow or with wrong turns</td>
+        <td><span class="mono">interval × 1.2</span></td>
+        <td><span class="mono">−0.15</span></td>
+      </tr>
+      <tr>
+        <td><span class="grade good">Good</span></td>
+        <td>Solved at a normal pace</td>
+        <td><span class="mono">1 → 6 → interval × ease</span></td>
+        <td><span class="mono">±0</span></td>
+      </tr>
+      <tr>
+        <td><span class="grade easy">Easy</span></td>
+        <td>Instant recall, clean solve</td>
+        <td><span class="mono">interval × ease × 1.3</span></td>
+        <td><span class="mono">+0.15</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Picking today's problem</h3>
+  <p>Every page load, the scheduler ranks the deck and picks one:</p>
+  <ul class="plain">
+    <li><strong>Most overdue card first</strong> — sorted by <code>now − dueDate</code>, descending.</li>
+    <li><strong>Tie-break by ease</strong> — weaker cards (lower ease) surface before stronger ones.</li>
+    <li><strong>Nothing due?</strong> Introduce the next <em>new</em> problem from the configured source list (NeetCode 150 / Blind 75 / your own list), capped at N new cards per day.</li>
+  </ul>
+
+  <div class="note">
+    <span class="mono">Why self-grading, not auto-grading</span>
+    Runtime and attempt count are noisy signals (you might've re-read your old solution, or fought a silly typo). Anki's insight is that a one-tap honest self-assessment beats inferred difficulty. Auto-suggesting a grade from solve time is a nice v2 feature — but the human confirms.
+  </div>
+</section>
+
+<!-- ================= 04 ARCHITECTURE ================= -->
+<section id="arch" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <div>
+      <span class="sec-label">How It's Built</span>
+      <h2>Architecture</h2>
+    </div>
+  </div>
+
+  <p class="lede">A Manifest V3 extension with two content scripts, a tiny scheduling library, and <code>chrome.storage.local</code> as the single source of truth. No servers, no accounts — your deck lives in your browser.</p>
+
+  <div class="arch">
+    <div class="arch-box">
+      <span class="t">Content Script ①</span>
+      <p class="d">Runs on <strong>/problemset/</strong>. Waits for the problem table via <code>MutationObserver</code>, asks the scheduler for today's card, injects the review card above the list. Re-runs on SPA navigation.</p>
+      <span class="file">content/problemset.js</span>
+    </div>
+    <div class="arch-conn"><span>reads</span></div>
+    <div class="arch-box accent">
+      <span class="t">Scheduler Core</span>
+      <p class="d">Pure functions, no DOM. <code>rate(card, grade) → card′</code> and <code>pickToday(deck) → card</code>. Unit-testable in isolation — this is the heart of the project.</p>
+      <span class="file">lib/sm2.js · lib/select.js</span>
+    </div>
+    <div class="arch-conn"><span>persists</span></div>
+    <div class="arch-box">
+      <span class="t">Storage</span>
+      <p class="d"><code>chrome.storage.local</code> holding the deck (one record per problem), settings, and review log. Export/import as JSON from the popup.</p>
+      <span class="file">lib/store.js</span>
+    </div>
+
+    <div class="arch-row2">
+      <div class="arch-box">
+        <span class="t">Content Script ②</span>
+        <p class="d">Runs on <strong>/problems/*</strong>. Detects the <em>Accepted</em> verdict in the submission result panel; if the problem is in the deck and due, shows the rating overlay and writes the grade back.</p>
+        <span class="file">content/problem.js</span>
+      </div>
+      <div class="arch-box">
+        <span class="t">Popup UI</span>
+        <p class="d">Deck stats, due queue, streak, settings (new-cards-per-day, source list), export/import. Plain HTML/CSS/JS — no framework needed at this size.</p>
+        <span class="file">popup/popup.html</span>
+      </div>
+    </div>
+  </div>
+  <p class="figcap">4 — Module map. Arrows are function calls, not message passing — everything except storage is synchronous.</p>
+
+  <h3>Key technical decisions</h3>
+
+  <ul class="plain">
+    <li><strong>Manifest V3, content-script-only.</strong> No background service worker needed for v1 — all logic runs when a LeetCode page is open. Permissions: <code>storage</code> plus host access to <code>leetcode.com</code>.</li>
+    <li><strong>LeetCode is a SPA.</strong> The problems table renders late and survives client-side navigation. Use a <code>MutationObserver</code> on <code>document.body</code> to detect the table appearing, and re-check on URL changes (observe <code>history.pushState</code> via a popstate/poll hybrid). Never assume the DOM is ready at <code>document_idle</code>.</li>
+    <li><strong>Detecting "Accepted".</strong> Primary: observe the result panel DOM for the accepted state. Fallback/bootstrap: query LeetCode's same-origin GraphQL endpoint (<code>recentAcSubmissionList</code>) from the content script — it rides your existing session cookie, no auth flow needed. This also lets the extension <em>seed the deck from your historical solves</em> on first run.</li>
+    <li><strong>Problem identity = titleSlug.</strong> Problem numbers and titles can be parsed from the page, but the slug in the URL (<code>/problems/two-sum/</code>) is the stable key.</li>
+    <li><strong>Resilience to DOM changes.</strong> All selectors live in one <code>selectors.js</code> file with a fallback chain, so a LeetCode redesign is a one-file fix. The injected card is built from the extension's own styles (shadow DOM) so LeetCode's CSS can't break it.</li>
+  </ul>
+</section>
+
+<!-- ================= 05 DATA ================= -->
+<section id="data" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <div>
+      <span class="sec-label">Storage Shape</span>
+      <h2>Data model</h2>
+    </div>
+  </div>
+
+  <p>One record per problem, keyed by slug. Dates are ISO strings; the review log is append-only so stats and future algorithm changes (e.g. migrating to FSRS) can be recomputed from history.</p>
+
+<pre><code><span class="c-com">// chrome.storage.local — full shape</span>
+<span class="c-punc">{</span>
+  <span class="c-key">"deck"</span><span class="c-punc">:</span> <span class="c-punc">{</span>
+    <span class="c-key">"longest-substring-without-repeating-characters"</span><span class="c-punc">:</span> <span class="c-punc">{</span>
+      <span class="c-key">"title"</span><span class="c-punc">:</span>      <span class="c-str">"Longest Substring Without Repeating Characters"</span><span class="c-punc">,</span>
+      <span class="c-key">"questionId"</span><span class="c-punc">:</span> <span class="c-num">3</span><span class="c-punc">,</span>
+      <span class="c-key">"difficulty"</span><span class="c-punc">:</span> <span class="c-str">"Medium"</span><span class="c-punc">,</span>
+      <span class="c-key">"tags"</span><span class="c-punc">:</span>       <span class="c-punc">[</span><span class="c-str">"sliding-window"</span><span class="c-punc">,</span> <span class="c-str">"hash-table"</span><span class="c-punc">],</span>
+      <span class="c-key">"ease"</span><span class="c-punc">:</span>       <span class="c-num">2.5</span><span class="c-punc">,</span>
+      <span class="c-key">"intervalDays"</span><span class="c-punc">:</span> <span class="c-num">6</span><span class="c-punc">,</span>
+      <span class="c-key">"reps"</span><span class="c-punc">:</span>       <span class="c-num">2</span><span class="c-punc">,</span>
+      <span class="c-key">"dueDate"</span><span class="c-punc">:</span>    <span class="c-str">"2026-06-11"</span><span class="c-punc">,</span>
+      <span class="c-key">"addedAt"</span><span class="c-punc">:</span>    <span class="c-str">"2026-05-29"</span>
+    <span class="c-punc">}</span>
+  <span class="c-punc">},</span>
+  <span class="c-key">"reviewLog"</span><span class="c-punc">:</span> <span class="c-punc">[</span>
+    <span class="c-punc">{</span> <span class="c-key">"slug"</span><span class="c-punc">:</span> <span class="c-str">"longest-substring-..."</span><span class="c-punc">,</span> <span class="c-key">"date"</span><span class="c-punc">:</span> <span class="c-str">"2026-06-05"</span><span class="c-punc">,</span> <span class="c-key">"grade"</span><span class="c-punc">:</span> <span class="c-str">"good"</span> <span class="c-punc">}</span>
+  <span class="c-punc">],</span>
+  <span class="c-key">"settings"</span><span class="c-punc">:</span> <span class="c-punc">{</span>
+    <span class="c-key">"newPerDay"</span><span class="c-punc">:</span>  <span class="c-num">1</span><span class="c-punc">,</span>
+    <span class="c-key">"sourceList"</span><span class="c-punc">:</span> <span class="c-str">"neetcode-150"</span><span class="c-punc">,</span>
+    <span class="c-key">"username"</span><span class="c-punc">:</span>   <span class="c-str">"nick"</span>
+  <span class="c-punc">}</span>
+<span class="c-punc">}</span></code></pre>
+
+  <p>And the entire SM-2 update, for scale — the algorithm is genuinely this small:</p>
+
+<pre><code><span class="c-com">// lib/sm2.js — the whole engine</span>
+<span class="c-key">function</span> rate<span class="c-punc">(</span>card<span class="c-punc">,</span> grade<span class="c-punc">)</span> <span class="c-punc">{</span>
+  <span class="c-key">if</span> <span class="c-punc">(</span>grade <span class="c-punc">===</span> <span class="c-str">"again"</span><span class="c-punc">)</span>
+    <span class="c-key">return</span> <span class="c-punc">{</span> <span class="c-punc">...</span>card<span class="c-punc">,</span> reps<span class="c-punc">:</span> <span class="c-num">0</span><span class="c-punc">,</span> intervalDays<span class="c-punc">:</span> <span class="c-num">1</span><span class="c-punc">,</span>
+             ease<span class="c-punc">:</span> Math<span class="c-punc">.</span>max<span class="c-punc">(</span><span class="c-num">1.3</span><span class="c-punc">,</span> card<span class="c-punc">.</span>ease <span class="c-punc">-</span> <span class="c-num">0.2</span><span class="c-punc">)</span> <span class="c-punc">};</span>
+
+  <span class="c-key">const</span> ease <span class="c-punc">=</span> grade <span class="c-punc">===</span> <span class="c-str">"hard"</span> <span class="c-punc">?</span> Math<span class="c-punc">.</span>max<span class="c-punc">(</span><span class="c-num">1.3</span><span class="c-punc">,</span> card<span class="c-punc">.</span>ease <span class="c-punc">-</span> <span class="c-num">0.15</span><span class="c-punc">)</span>
+             <span class="c-punc">:</span> grade <span class="c-punc">===</span> <span class="c-str">"easy"</span> <span class="c-punc">?</span> card<span class="c-punc">.</span>ease <span class="c-punc">+</span> <span class="c-num">0.15</span> <span class="c-punc">:</span> card<span class="c-punc">.</span>ease<span class="c-punc">;</span>
+
+  <span class="c-key">const</span> intervalDays <span class="c-punc">=</span>
+      card<span class="c-punc">.</span>reps <span class="c-punc">===</span> <span class="c-num">0</span> <span class="c-punc">?</span> <span class="c-num">1</span>
+    <span class="c-punc">:</span> card<span class="c-punc">.</span>reps <span class="c-punc">===</span> <span class="c-num">1</span> <span class="c-punc">?</span> <span class="c-num">6</span>
+    <span class="c-punc">:</span> Math<span class="c-punc">.</span>round<span class="c-punc">(</span>card<span class="c-punc">.</span>intervalDays <span class="c-punc">*</span>
+        <span class="c-punc">(</span>grade <span class="c-punc">===</span> <span class="c-str">"hard"</span> <span class="c-punc">?</span> <span class="c-num">1.2</span> <span class="c-punc">:</span> grade <span class="c-punc">===</span> <span class="c-str">"easy"</span> <span class="c-punc">?</span> ease <span class="c-punc">*</span> <span class="c-num">1.3</span> <span class="c-punc">:</span> ease<span class="c-punc">));</span>
+
+  <span class="c-key">return</span> <span class="c-punc">{</span> <span class="c-punc">...</span>card<span class="c-punc">,</span> ease<span class="c-punc">,</span> intervalDays<span class="c-punc">,</span> reps<span class="c-punc">:</span> card<span class="c-punc">.</span>reps <span class="c-punc">+</span> <span class="c-num">1</span><span class="c-punc">,</span>
+           dueDate<span class="c-punc">:</span> addDays<span class="c-punc">(</span>today<span class="c-punc">(),</span> intervalDays<span class="c-punc">)</span> <span class="c-punc">};</span>
+<span class="c-punc">}</span></code></pre>
+</section>
+
+<!-- ================= 06 ROADMAP ================= -->
+<section id="roadmap" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <div>
+      <span class="sec-label">Build Order</span>
+      <h2>Roadmap</h2>
+    </div>
+  </div>
+
+  <p class="lede">Four phases, each one shippable. Phase 1 alone is already useful.</p>
+
+  <div class="phases">
+    <div class="phase">
+      <span class="phase-num">i</span>
+      <div class="phase-body">
+        <span class="phase-goal">Goal · a card appears on the page</span>
+        <h3>Skeleton &amp; injection</h3>
+        <ul class="checklist">
+          <li>Manifest V3 scaffold; load unpacked in Chrome</li>
+          <li>Content script that reliably finds the problem table (MutationObserver + SPA nav handling)</li>
+          <li>Inject a styled review card (shadow DOM) with a hardcoded problem</li>
+          <li><code>lib/sm2.js</code> + <code>lib/select.js</code> written and unit-tested with plain Node — before any UI uses them</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <span class="phase-num">ii</span>
+      <div class="phase-body">
+        <span class="phase-goal">Goal · the loop closes</span>
+        <h3>Storage &amp; the review loop</h3>
+        <ul class="checklist">
+          <li>Deck persistence in <code>chrome.storage.local</code></li>
+          <li>Problem-page script: detect Accepted, show the rating overlay</li>
+          <li>Rating updates the card via SM-2; the problemset card reflects the new state</li>
+          <li>Manual "add to deck" button on any problem page</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <span class="phase-num">iii</span>
+      <div class="phase-body">
+        <span class="phase-goal">Goal · zero manual setup</span>
+        <h3>Seeding &amp; new-card flow</h3>
+        <ul class="checklist">
+          <li>First-run import: pull historical accepted submissions via LeetCode GraphQL and seed the deck</li>
+          <li>Bundle NeetCode 150 / Blind 75 as new-card source lists</li>
+          <li>"Nothing due → introduce a new problem" selection, with per-day cap</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <span class="phase-num">iv</span>
+      <div class="phase-body">
+        <span class="phase-goal">Goal · it feels like a product</span>
+        <h3>Popup, stats &amp; polish</h3>
+        <ul class="checklist">
+          <li>Popup: due queue, streak, deck browser, settings</li>
+          <li>JSON export / import (backup, machine moves)</li>
+          <li>Stats: retention rate, reviews-per-week, ease distribution</li>
+          <li>Stretch: swap SM-2 for FSRS; suggested grade from solve time</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 RISKS ================= -->
+<section id="risks" class="reveal">
+  <div class="sec-head">
+    <span class="sec-num">07</span>
+    <div>
+      <span class="sec-label">Known Hazards</span>
+      <h2>Risks &amp; open questions</h2>
+    </div>
+  </div>
+
+  <div class="risk-grid">
+    <div class="risk">
+      <div class="t">LeetCode redesigns its DOM</div>
+      <p>The problem table and result panel have no stable public contract; class names are hashed and change.</p>
+      <p class="mit"><b>Mitigation</b> — all selectors centralized with fallback chains; prefer structural anchors (the link grid under <code>/problemset/</code>) over class names; GraphQL fallback for solve detection.</p>
+    </div>
+    <div class="risk">
+      <div class="t">SPA timing flakiness</div>
+      <p>Injecting too early gets wiped by React hydration; too late and the card pops in jarringly.</p>
+      <p class="mit"><b>Mitigation</b> — observe for the table, inject once it's stable for ~100ms, and re-assert presence on mutations (idempotent inject keyed by element id).</p>
+    </div>
+    <div class="risk">
+      <div class="t">Single-device deck</div>
+      <p><code>chrome.storage.local</code> doesn't follow you across machines.</p>
+      <p class="mit"><b>Mitigation</b> — v1: JSON export/import. Later: <code>chrome.storage.sync</code> (size limits apply — review log may need pruning) or rebuild-from-GraphQL on a new machine.</p>
+    </div>
+    <div class="risk">
+      <div class="t">Grading honesty</div>
+      <p>Self-rating only works if you're honest; "Easy" inflation collapses the schedule's value.</p>
+      <p class="mit"><b>Mitigation</b> — show solve-time context next to the buttons ("you took 34 min — sure this was Easy?") as a gentle nudge, not an override.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>LeetLoop · Plan v0.1</span>
+  <span>nick · june 2026</span>
+  <span>next step → phase i scaffold</span>
+</footer>
+
+</div>
+
+<script>
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }
+}, { threshold: 0.06 });
+document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+</script>
+
+</body>
+</html>

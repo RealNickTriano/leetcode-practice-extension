@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Leetcode Anki: a review star with code brackets at its heart.
+       Star = spaced repetition / favorites; < > = LeetCode problems. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb13d"/>
+      <stop offset="1" stop-color="#e8930c"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#1c1a17"/>
+  <!-- 5-point star, center (64,67), outer R 44, inner r 22; the matching
+       stroke with round joins gives the points soft tips. -->
+  <path d="M64 23 L76.93 49.2 L105.85 53.4 L84.92 73.8 L89.86 102.6 L64 89
+           L38.14 102.6 L43.08 73.8 L22.15 53.4 L51.07 49.2 Z"
+        fill="url(#g)" stroke="url(#g)" stroke-width="9" stroke-linejoin="round"/>
+  <!-- code brackets cut into the star's core -->
+  <path d="M57 60 L49.5 67 L57 74 M71 60 L78.5 67 L71 74"
+        fill="none" stroke="#1c1a17" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
