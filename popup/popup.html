@@ -5,12 +5,17 @@
 <link rel="stylesheet" href="popup.css">
 <title>Leetcode Anki</title>
 </head>
-<body>
+<body data-tab="deck">
 
 <header>
   <span class="brand"><img src="../icons/icon32.png" alt="" width="16" height="16">Leetcode Anki</span>
   <span class="counts" id="counts"></span>
 </header>
+
+<nav class="tabs">
+  <button class="tab" data-tab="deck">Deck</button>
+  <button class="tab" data-tab="settings">Settings</button>
+</nav>
 
 <div class="deckbar">
   <select id="deck-select" aria-label="Selected deck"></select>
@@ -24,6 +29,17 @@
 </div>
 
 <main id="list" aria-label="Deck"></main>
+
+<section class="settings" aria-label="Settings">
+  <label class="setting">
+    <span>
+      <span class="setting-name">Reset code on review</span>
+      <span class="setting-desc">When you open a due or new deck problem, reset the editor
+        to the default template so your old solution stays hidden.</span>
+    </span>
+    <input type="checkbox" id="set-reset-code" class="switch">
+  </label>
+</section>
 
 <script src="../lib/sm2.js"></script>
 <script src="../lib/select.js"></script>

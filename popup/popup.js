@@ -11,6 +11,7 @@
   const newDeckRow = document.getElementById("newdeck-row");
   const newDeckName = document.getElementById("newdeck-name");
   const newDeckCreate = document.getElementById("newdeck-create");
+  const resetCodeSwitch = document.getElementById("set-reset-code");
 
   // Destructive buttons take two clicks: the first arms ("sure?"), the
   // second within 2.5s fires; otherwise the button disarms itself.
@@ -111,8 +112,10 @@
   }
 
   async function render() {
-    const { deck, decks, deckId } = await store.load();
+    const { deck, decks, deckId, settings } = await store.load();
     const today = SM2.today();
+
+    resetCodeSwitch.checked = settings.resetCode !== false;
 
     deckSelect.replaceChildren(
       ...Object.entries(decks).map(([id, d]) => {
@@ -200,6 +203,18 @@
     }
     disarmDelete();
     await store.deleteDeck(deckSelect.value); // onChange re-renders
+  });
+
+  // ----- tabs & settings -----
+
+  for (const tab of document.querySelectorAll(".tab")) {
+    tab.addEventListener("click", () => {
+      document.body.dataset.tab = tab.dataset.tab;
+    });
+  }
+
+  resetCodeSwitch.addEventListener("change", () => {
+    store.updateSettings({ resetCode: resetCodeSwitch.checked });
   });
 
   store.onChange(render);

@@ -35,6 +35,102 @@ header {
 .counts { font-size: 11px; color: #8a8478; }
 .counts b { color: #ffb858; font-weight: 600; }
 
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #262320;
+  background: #1c1a17;
+}
+
+.tab {
+  flex: 1;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #8a8478;
+  padding: 9px 0 7px;
+  cursor: pointer;
+}
+
+.tab:hover { color: #b5ad9d; }
+
+body[data-tab="deck"] .tab[data-tab="deck"],
+body[data-tab="settings"] .tab[data-tab="settings"] {
+  color: #ffb858;
+  border-bottom-color: #e8930c;
+}
+
+/* tab visibility */
+body[data-tab="settings"] .deckbar,
+body[data-tab="settings"] .newdeck,
+body[data-tab="settings"] main { display: none; }
+body[data-tab="deck"] .settings { display: none; }
+
+/* ----- settings tab ----- */
+
+.settings { padding: 6px 0; }
+
+.setting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #262320;
+  cursor: pointer;
+}
+
+.setting:hover { background: #211f1b; }
+
+.setting-name {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #f2ecdf;
+}
+
+.setting-desc {
+  display: block;
+  margin-top: 4px;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: #8a8478;
+}
+
+.switch {
+  appearance: none;
+  flex-shrink: 0;
+  width: 34px;
+  height: 20px;
+  border-radius: 99px;
+  background: #3a362f;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin: 0;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8a8478;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.switch:checked { background: rgba(232, 147, 12, 0.45); }
+.switch:checked::after {
+  transform: translateX(14px);
+  background: #e8930c;
+}
+
 .deckbar, .newdeck {
   display: flex;
   align-items: center;
