@@ -444,20 +444,40 @@
   // ---------- accepted detection ----------
 
   // Two steps: (1) the user submits — the Submit click (or Ctrl/Cmd+Enter)
-  // arms a verdict watch for a few minutes; (2) the Accepted verdict newly
-  // appears while armed. Step 1 is what keeps the submission-history table —
+  // arms a verdict watch for a few minutes; (2) the verdict of *that*
+  // submission arrives. Step 1 is what keeps the submission-history table —
   // whose old rows also read "Accepted" — from triggering the overlay just
   // by opening the Submissions tab.
+  //
+  // Step 2 has two detection paths. Preferred: submitting navigates to the
+  // new submission's own page (/problems/<slug>/submissions/<id>/), so a
+  // fresh id appearing while armed pins the watch to that submission's
+  // result pane — immune to whatever old verdicts are visible elsewhere.
+  // Fallback (no navigation observed): a fresh visibility edge of the
+  // Accepted text. The edge alone isn't enough: with the Submissions pane
+  // open during submit, old "Accepted" rows keep the text visible the whole
+  // time and no edge ever fires.
   const SUBMIT_WINDOW_MS = 3 * 60 * 1000; // judging can be slow; expire eventually
 
   let armedAt = 0; // 0 = not watching for a verdict
+  let submissionIdAtArm = null;
+  let watchedSubmission = null; // set once the new submission's page is seen
   let verdictWasVisible = false;
   let failedWasVisible = false;
   let promptedSlug = null; // at most one rating prompt per page visit
 
+  function submissionIdFromPath() {
+    const m = location.pathname.match(/^\/problems\/[^/]+\/submissions\/(\d+)/);
+    return m ? m[1] : null;
+  }
+
   function armVerdictWatch() {
     if (!slugFromPath()) return;
     armedAt = Date.now();
+    // An id already in the URL is an *old* submission the user was viewing;
+    // only an id different from this one marks the new submission's page.
+    submissionIdAtArm = submissionIdFromPath();
+    watchedSubmission = null;
     // Snapshot what's on screen now, so only a *fresh* verdict (an edge)
     // counts — either way. A leftover Accepted must not fire the prompt,
     // and a leftover Wrong Answer from the previous attempt must not
@@ -500,10 +520,45 @@
       armedAt = 0;
       return;
     }
-    // A *fresh* failed verdict ends this submission — disarm so old
-    // "Accepted" rows in the history table can't fire later within the
-    // window. Edge-based, like the Accepted check: a stale Wrong Answer
-    // still on screen from the previous attempt doesn't count.
+
+    // Preferred path: pin the watch to the new submission's page. Snapshot
+    // the result pane at pin time — right after the navigation it can still
+    // briefly show the previous submission's verdict, which must not count.
+    const id = submissionIdFromPath();
+    if (id && id !== submissionIdAtArm && !watchedSubmission) {
+      const stale = Selectors.findSubmissionResult();
+      watchedSubmission = {
+        id,
+        staleEl: stale,
+        staleText: stale ? stale.textContent.trim() : "",
+      };
+    }
+
+    if (watchedSubmission) {
+      const result = Selectors.findSubmissionResult();
+      // Judging unmounts the old result element, so the new verdict arrives
+      // as a new element (or at least new text). Anything matching the
+      // pin-time snapshot is leftovers — keep waiting.
+      if (
+        !result ||
+        (result === watchedSubmission.staleEl &&
+          result.textContent.trim() === watchedSubmission.staleText)
+      ) {
+        return;
+      }
+      if (result.textContent.trim() === "Accepted") {
+        armedAt = 0;
+        maybePrompt();
+      } else if (Selectors.findFailedVerdict()) {
+        armedAt = 0;
+      }
+      return;
+    }
+
+    // Fallback path: visibility edges. A *fresh* failed verdict ends this
+    // submission — disarm so old "Accepted" rows in the history table can't
+    // fire later within the window. A stale Wrong Answer still on screen
+    // from the previous attempt doesn't count.
     const failed = !!Selectors.findFailedVerdict();
     if (failed && !failedWasVisible) {
       armedAt = 0;
@@ -536,6 +591,7 @@
         verdictWasVisible = false;
         failedWasVisible = false;
         armedAt = 0; // a pending submission doesn't follow you to another problem
+        watchedSubmission = null;
         removeOverlay();
         renderPill();
         if (slug) queueDraftReset(slug);
