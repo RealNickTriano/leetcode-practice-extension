@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "node --test",
-    "package": "node --test && zip -r leetcode-anki-$npm_package_version.zip manifest.json content lib popup icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png"
+    "package": "node --test && zip -r leetcode-anki-$npm_package_version.zip manifest.json background.js content lib popup icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png"
   },
   "devDependencies": {
     "sharp": "^0.35.1"

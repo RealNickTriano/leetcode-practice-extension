@@ -114,6 +114,47 @@ test("updateSettings merges partial changes", async () => {
   assert.equal(s.settings.sourceList, "blind-75");
 });
 
+// Like real chrome.storage: values are copied (not shared references) and
+// each call yields to the event loop, so an unserialized read-modify-write
+// race actually loses writes here — memoryBackend's shared references would
+// mask it.
+function cloningBackend() {
+  const data = {};
+  const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+  return {
+    async get(keys) {
+      await tick();
+      const out = {};
+      for (const k of keys) if (k in data) out[k] = structuredClone(data[k]);
+      return out;
+    },
+    async set(entries) {
+      await tick();
+      Object.assign(data, structuredClone(entries));
+    },
+    async remove(keys) {
+      await tick();
+      for (const k of keys) delete data[k];
+    },
+  };
+}
+
+test("concurrent operations serialize instead of clobbering each other", async () => {
+  const store = createStore(cloningBackend(), SM2);
+  await store.addCard("a", META, DAY);
+  await Promise.all([
+    store.addCard("b", META, DAY),
+    store.rateCard("a", "good", DAY),
+    store.seedCards([{ slug: "c", title: "C" }, { slug: "d", title: "D" }], DAY),
+    store.updateSettings({ newPerDay: 2 }),
+  ]);
+  const s = await store.load();
+  assert.deepEqual(Object.keys(s.deck).sort(), ["a", "b", "c", "d"]);
+  assert.equal(s.deck.a.reps, 1); // the rating survived the concurrent adds
+  assert.equal(s.reviewLog.length, 1);
+  assert.equal(s.settings.newPerDay, 2);
+});
+
 // ----- multiple decks -----
 
 test("migrates v1 single-deck storage to decks/currentDeckId", async () => {

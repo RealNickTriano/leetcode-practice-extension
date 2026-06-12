@@ -48,8 +48,9 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
 
 `npm run package` runs the full test suite and then builds
 `leetcode-anki-<version>.zip` (a red test blocks the package). The zip
-contains exactly what the manifest references — `manifest.json` at the root,
-`content/`, `lib/`, `popup/`, and the four icon PNGs. Tests, docs, configs,
+contains exactly what the manifest references — `manifest.json` and
+`background.js` at the root, `content/`, `lib/`, `popup/`, and the four
+icon PNGs. Tests, docs, configs,
 the icon-source SVG, and `node_modules` are excluded; built zips are
 gitignored.
 
@@ -81,6 +82,7 @@ runs under plain Node.
 
 ```
 manifest.json            MV3 manifest
+background.js            service worker — owns all storage writes
 content/problemset.js    finds the problem list, injects the review card
 content/problem.js       add-to-deck pill, Accepted detection, rating overlay
 lib/sm2.js               SM-2: rate(card, grade) → card′
