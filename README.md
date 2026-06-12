@@ -32,7 +32,9 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
 - ✅ Settings tab in the popup: reset-code-on-review and show-topic-tags
   toggles, new-cards-per-day, and day rollover hour (Anki-style "next day
   starts at 4am"; default midnight)
-- ⬜ Phase 4 remaining: stats and JSON export/import
+- ✅ JSON backup: export/import the full state (decks, review log, settings)
+  from the popup's settings tab — importing replaces local state
+- ⬜ Phase 4 remaining: stats
 
 ## Try it
 

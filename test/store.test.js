@@ -155,6 +155,48 @@ test("concurrent operations serialize instead of clobbering each other", async (
   assert.equal(s.settings.newPerDay, 2);
 });
 
+// ----- backup -----
+
+test("exportState → importState round-trips into a fresh store", async () => {
+  const src = createStore(memoryBackend(), SM2);
+  await src.addCard("two-sum", META, DAY);
+  await src.rateCard("two-sum", "good", DAY);
+  await src.createDeck("Second");
+  await src.updateSettings({ newPerDay: 3 });
+  const backup = await src.exportState();
+
+  const dst = createStore(memoryBackend(), SM2);
+  await dst.addCard("stale-card", META, DAY); // must be replaced, not merged
+  await dst.importState(backup);
+
+  const s = await dst.load();
+  assert.equal(s.deckId, "second"); // selection travels with the backup
+  assert.equal(s.decks.default.cards["two-sum"].reps, 1);
+  assert.equal(s.decks.default.cards["stale-card"], undefined);
+  assert.equal(s.settings.newPerDay, 3);
+  assert.equal(s.reviewLog.length, 1);
+});
+
+test("importState rejects non-backup data", async () => {
+  const store = createStore(memoryBackend(), SM2);
+  await assert.rejects(() => store.importState(null), /invalid backup/);
+  await assert.rejects(() => store.importState({ foo: 1 }), /invalid backup/);
+  await assert.rejects(
+    () => store.importState({ decks: { d: { cards: {} } } }), // deck without a name
+    /bad deck/
+  );
+  await assert.rejects(() => store.importState({ version: 2, decks: {} }), /newer/);
+});
+
+test("importState self-heals an unknown selected deck", async () => {
+  const store = createStore(memoryBackend(), SM2);
+  await store.importState({
+    decks: { only: { name: "Only", cards: {} } },
+    currentDeckId: "nope",
+  });
+  assert.equal((await store.load()).deckId, "only");
+});
+
 // ----- multiple decks -----
 
 test("migrates v1 single-deck storage to decks/currentDeckId", async () => {

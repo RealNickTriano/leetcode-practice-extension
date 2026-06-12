@@ -1,8 +1,8 @@
 # Planned Features
 
 Settings candidates from a design discussion on 2026-06-12, in rough order
-of value-for-effort. (The first two from that list — new cards per day and
-the day rollover hour — shipped the same day.)
+of value-for-effort. (New cards per day, the day rollover hour, and JSON
+export/import shipped the same day.)
 
 ## 1. Maximum interval cap
 
@@ -21,14 +21,6 @@ naturally.
 **Variant:** currently future-scheduled cards never prompt; an "allow early
 reviews" option could let solving a card ahead of schedule count as its
 review instead of being ignored.
-
-## 3. JSON export/import
-
-Already on the Phase 4 list, and it belongs on the settings tab. With
-`reviewLog` accumulating and everything in `chrome.storage.local`, an
-uninstall or profile loss wipes all scheduling state. Less a setting than
-insurance — pairs well with the review log, which exists precisely so
-history survives into features like this.
 
 ## Deliberately not planned
 

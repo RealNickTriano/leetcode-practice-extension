@@ -72,6 +72,18 @@
     </span>
     <input type="checkbox" id="set-show-tags" class="switch">
   </label>
+  <div class="setting">
+    <span>
+      <span class="setting-name">Backup</span>
+      <span class="setting-desc">Export decks, review history, and settings as JSON,
+        or restore from a backup. Importing replaces everything on this machine.</span>
+    </span>
+    <span class="backup-actions">
+      <button id="export-json">export</button>
+      <button id="import-json">import</button>
+    </span>
+    <input type="file" id="import-file" accept=".json,application/json" hidden>
+  </div>
 </section>
 
 <script src="../lib/sm2.js"></script>

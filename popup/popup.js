@@ -261,6 +261,48 @@
     store.updateSettings({ showTags: showTagsSwitch.checked });
   });
 
+  // ----- backup: JSON export / import -----
+
+  const exportBtn = document.getElementById("export-json");
+  const importBtn = document.getElementById("import-json");
+  const importFile = document.getElementById("import-file");
+
+  exportBtn.addEventListener("click", async () => {
+    const state = await store.exportState();
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `leetcode-anki-backup-${SM2.today()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Importing replaces everything, so the button arms first ("sure?") and
+  // only the second click opens the file picker.
+  armable(importBtn, () => {
+    importBtn.classList.remove("armed");
+    importBtn.textContent = "import";
+    importFile.click();
+  });
+
+  importFile.addEventListener("change", async () => {
+    const file = importFile.files[0];
+    importFile.value = ""; // so re-picking the same file fires change again
+    if (!file) return;
+    try {
+      const state = JSON.parse(await file.text());
+      await store.importState(state); // onChange re-renders the deck view
+      importBtn.textContent = "imported ✓";
+    } catch (e) {
+      importBtn.textContent =
+        e instanceof SyntaxError ? "not a JSON file" : e.message || "import failed";
+    }
+    setTimeout(() => {
+      importBtn.textContent = "import";
+    }, 4000);
+  });
+
   // A stepper saves its setting clamped to a whole number in [min, max],
   // writing the clamped value back so the field always shows what was saved.
   function wireStepper(input, decId, incId, key, min, max) {

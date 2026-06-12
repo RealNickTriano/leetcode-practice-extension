@@ -145,6 +145,33 @@ body[data-tab="deck"] .settings { display: none; }
 
 .num-input:focus { outline: none; border-color: #e8930c; }
 
+.backup-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.backup-actions button {
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(232, 147, 12, 0.15);
+  border: 1px solid rgba(232, 147, 12, 0.5);
+  color: #ffb858;
+  border-radius: 6px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+.backup-actions button:hover { background: rgba(232, 147, 12, 0.28); }
+
+.backup-actions button.armed {
+  background: none;
+  border-color: #ff6b66;
+  color: #ff6b66;
+}
+
 .switch {
   appearance: none;
   flex-shrink: 0;
