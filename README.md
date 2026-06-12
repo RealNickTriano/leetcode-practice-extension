@@ -34,7 +34,9 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
   starts at 4am"; default midnight)
 - ✅ JSON backup: export/import the full state (decks, review log, settings)
   from the popup's settings tab — importing replaces local state
-- ⬜ Phase 4 remaining: stats
+- ✅ Stats tab in the popup: deck maturity (new/learning/mature) and a 7-day
+  due forecast; ratings now also log the interval that was tested
+- ⬜ Phase 4 remaining: more stats (pass rate, trouble problems, weak topics)
 
 ## Try it
 
@@ -93,6 +95,7 @@ content/problem.js       add-to-deck pill, Accepted detection, rating overlay
 lib/sm2.js               SM-2: rate(card, grade) → card′
 lib/select.js            pickToday(deck) → most-overdue due card
 lib/store.js             deck persistence over chrome.storage.local
+lib/stats.js             deck maturity buckets + due-date forecast
 lib/selectors.js         every LeetCode DOM selector, with fallback chains
 lib/lists.js             NeetCode 150 + Blind 75 source lists, in study order
 lib/api.js               LeetCode GraphQL: question metadata

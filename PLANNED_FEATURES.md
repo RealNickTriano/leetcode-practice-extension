@@ -22,6 +22,20 @@ naturally.
 reviews" option could let solving a card ahead of schedule count as its
 review instead of being ignored.
 
+## Stats (remaining)
+
+The stats tab shipped 2026-06-12 with deck maturity and a 7-day due
+forecast. Still on the list, in order:
+
+- **Pass rate (retention)** — % of reviews graded good or better, overall
+  and last 30 days, from the review log. ~90% means the scheduler is doing
+  its job. Log entries now stamp `intervalDays` (the interval going into
+  each review) so retention can later be weighted by interval.
+- **Trouble problems (leeches)** — the problems with the most "again"
+  ratings or lowest ease, as a short click-through list.
+- **Weak topics** — again-rates grouped by topic tag. Needs a meaningful
+  sample size; tags only exist on cards still in the deck.
+
 ## Deliberately not planned
 
 - **SM-2 tuning knobs** (ease modifiers, graduation intervals) — they

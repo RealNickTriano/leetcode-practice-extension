@@ -1,7 +1,7 @@
 // Popup deck browser: every card sorted by due date (most overdue first),
 // click-through to the problem, remove with ✕. Re-renders on storage change.
 (function () {
-  const { SM2, store } = globalThis.LeetcodeAnki;
+  const { SM2, Stats, store } = globalThis.LeetcodeAnki;
 
   const countsEl = document.getElementById("counts");
   const listEl = document.getElementById("list");
@@ -101,6 +101,61 @@
     return row;
   }
 
+  // ----- stats tab -----
+
+  const maturityBar = document.getElementById("maturity-bar");
+  const maturityLegend = document.getElementById("maturity-legend");
+  const forecastEl = document.getElementById("forecast");
+
+  const MATURITY_SEGMENTS = [
+    ["new", "seg-new", "#5ab8ff"],
+    ["learning", "seg-learning", "#e8930c"],
+    ["mature", "seg-mature", "#2db55d"],
+  ];
+
+  function renderStats(deck, today) {
+    const m = Stats.maturity(deck);
+    maturityBar.replaceChildren();
+    maturityLegend.replaceChildren();
+    for (const [key, cls, color] of MATURITY_SEGMENTS) {
+      if (m.total > 0) {
+        const seg = document.createElement("span");
+        seg.className = cls;
+        seg.style.width = `${(m[key] / m.total) * 100}%`;
+        maturityBar.append(seg);
+      }
+      const item = document.createElement("span");
+      const swatch = document.createElement("i");
+      swatch.style.background = color;
+      const count = document.createElement("b");
+      count.textContent = m[key];
+      item.append(swatch, count, ` ${key}`);
+      maturityLegend.append(item);
+    }
+
+    const counts = Stats.forecast(deck, today, 7);
+    const max = Math.max(1, ...counts);
+    forecastEl.replaceChildren(
+      ...counts.map((count, i) => {
+        const col = document.createElement("div");
+        col.className = i === 0 ? "col today" : "col";
+        const n = document.createElement("span");
+        n.className = count === 0 ? "n zero" : "n";
+        n.textContent = count;
+        const bar = document.createElement("span");
+        bar.className = "bar";
+        bar.style.height = `${(count / max) * 48}px`;
+        const d = document.createElement("span");
+        d.className = "d";
+        const day = new Date(`${SM2.addDays(today, i)}T00:00:00`);
+        d.textContent =
+          i === 0 ? "today" : ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][day.getDay()];
+        col.append(n, bar, d);
+        return col;
+      })
+    );
+  }
+
   function buildEmpty() {
     const div = document.createElement("div");
     div.className = "empty";
@@ -137,6 +192,7 @@
       })
     );
     disarmDelete();
+    renderStats(deck, today);
 
     // Three groups, mirroring the picker: due reviews, then the new queue
     // in introduction order, then future-scheduled reviews.

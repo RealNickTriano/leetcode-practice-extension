@@ -59,16 +59,18 @@ header {
 .tab:hover { color: #b5ad9d; }
 
 body[data-tab="deck"] .tab[data-tab="deck"],
+body[data-tab="stats"] .tab[data-tab="stats"],
 body[data-tab="settings"] .tab[data-tab="settings"] {
   color: #ffb858;
   border-bottom-color: #e8930c;
 }
 
 /* tab visibility */
-body[data-tab="settings"] .deckbar,
-body[data-tab="settings"] .newdeck,
-body[data-tab="settings"] main { display: none; }
-body[data-tab="deck"] .settings { display: none; }
+body:not([data-tab="deck"]) .deckbar,
+body:not([data-tab="deck"]) .newdeck,
+body:not([data-tab="deck"]) main { display: none; }
+body:not([data-tab="settings"]) .settings { display: none; }
+body:not([data-tab="stats"]) .stats { display: none; }
 
 /* ----- settings tab ----- */
 
@@ -400,3 +402,84 @@ button.x:hover::after {
 }
 
 .empty b { color: #b5ad9d; }
+
+/* ----- stats tab ----- */
+
+.stats { padding: 16px; }
+
+.stat-block { margin-bottom: 22px; }
+.stat-block:last-child { margin-bottom: 6px; }
+
+.stat-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a8478;
+  margin-bottom: 10px;
+}
+
+.maturity-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: #262320;
+}
+
+.maturity-bar .seg-new { background: #5ab8ff; }
+.maturity-bar .seg-learning { background: #e8930c; }
+.maturity-bar .seg-mature { background: #2db55d; }
+
+.maturity-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 9px;
+  font-size: 10.5px;
+  color: #8a8478;
+}
+
+.maturity-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+.maturity-legend b { color: #e8e2d6; font-weight: 600; }
+
+.forecast {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  height: 84px;
+}
+
+.forecast .col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+
+.forecast .n { font-size: 10px; color: #ffb858; font-weight: 600; }
+.forecast .n.zero { color: #5c5648; font-weight: 400; }
+
+.forecast .bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  background: rgba(232, 147, 12, 0.55);
+  min-height: 2px;
+}
+
+.forecast .col.today .bar { background: #e8930c; }
+
+.forecast .d {
+  font-size: 9.5px;
+  color: #5c5648;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

@@ -14,6 +14,7 @@
 
 <nav class="tabs">
   <button class="tab" data-tab="deck">Deck</button>
+  <button class="tab" data-tab="stats">Stats</button>
   <button class="tab" data-tab="settings">Settings</button>
 </nav>
 
@@ -30,6 +31,18 @@
 </div>
 
 <main id="list" aria-label="Deck"></main>
+
+<section class="stats" aria-label="Stats">
+  <div class="stat-block">
+    <div class="stat-title">Deck maturity</div>
+    <div class="maturity-bar" id="maturity-bar"></div>
+    <div class="maturity-legend" id="maturity-legend"></div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-title">Due over the next 7 days</div>
+    <div class="forecast" id="forecast"></div>
+  </div>
+</section>
 
 <section class="settings" aria-label="Settings">
   <label class="setting">
@@ -88,6 +101,7 @@
 
 <script src="../lib/sm2.js"></script>
 <script src="../lib/select.js"></script>
+<script src="../lib/stats.js"></script>
 <script src="../lib/store.js"></script>
 <script src="popup.js"></script>
 </body>

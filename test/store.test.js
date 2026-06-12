@@ -47,7 +47,8 @@ test("rateCard applies SM-2, records lastGrade, appends the log", async () => {
   const { deck, reviewLog } = await store.load();
   assert.equal(deck["two-sum"].dueDate, "2026-06-12");
   assert.deepEqual(reviewLog, [
-    { slug: "two-sum", date: DAY, grade: "good", deckId: "default" },
+    // intervalDays = the interval going into the review (0: new card)
+    { slug: "two-sum", date: DAY, grade: "good", deckId: "default", intervalDays: 0 },
   ]);
 });
 
