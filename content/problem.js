@@ -58,7 +58,12 @@
   // ---------- problem metadata ----------
 
   async function fetchMeta(slug) {
-    const meta = await api.fetchQuestionMeta(slug);
+    let meta = null;
+    try {
+      meta = await api.fetchQuestionMeta(slug);
+    } catch {
+      // request failed — the DOM scrape below covers a single add
+    }
     if (!meta) return Selectors.metaFromDom(slug);
     const { paidOnly, ...rest } = meta;
     return rest;

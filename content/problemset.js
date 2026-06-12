@@ -391,7 +391,12 @@
   }
 
   async function metaForAdd(slug) {
-    const meta = await api.fetchQuestionMeta(slug);
+    let meta = null;
+    try {
+      meta = await api.fetchQuestionMeta(slug);
+    } catch {
+      // request failed — fall back to bare metadata; the row gives us the slug
+    }
     if (!meta) return { title: slug, questionId: null, difficulty: "", tags: [] };
     const { paidOnly, ...rest } = meta;
     return rest;
