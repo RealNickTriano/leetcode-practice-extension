@@ -13,7 +13,9 @@
   const nameInput = document.getElementById("namedeck-name");
   const nameConfirm = document.getElementById("namedeck-confirm");
   const resetCodeSwitch = document.getElementById("set-reset-code");
+  const showTagsSwitch = document.getElementById("set-show-tags");
   const newPerDayInput = document.getElementById("set-new-per-day");
+  const rolloverInput = document.getElementById("set-rollover-hour");
 
   // Destructive buttons take two clicks: the first arms ("sure?"), the
   // second within 2.5s fires; otherwise the button disarms itself.
@@ -121,7 +123,9 @@
     currentDeckName = deckName;
 
     resetCodeSwitch.checked = settings.resetCode !== false;
+    showTagsSwitch.checked = settings.showTags !== false;
     newPerDayInput.value = settings.newPerDay;
+    rolloverInput.value = settings.rolloverHour;
 
     deckSelect.replaceChildren(
       ...Object.entries(decks).map(([id, d]) => {
@@ -253,21 +257,29 @@
     store.updateSettings({ resetCode: resetCodeSwitch.checked });
   });
 
-  // Clamp to a whole number in [0, 10] and write the clamped value back so
-  // the field always shows what was saved.
-  function saveNewPerDay(value) {
-    const n = Math.max(0, Math.min(10, Math.floor(Number(value)) || 0));
-    newPerDayInput.value = n;
-    store.updateSettings({ newPerDay: n });
+  showTagsSwitch.addEventListener("change", () => {
+    store.updateSettings({ showTags: showTagsSwitch.checked });
+  });
+
+  // A stepper saves its setting clamped to a whole number in [min, max],
+  // writing the clamped value back so the field always shows what was saved.
+  function wireStepper(input, decId, incId, key, min, max) {
+    const save = (value) => {
+      const n = Math.max(min, Math.min(max, Math.floor(Number(value)) || 0));
+      input.value = n;
+      store.updateSettings({ [key]: n });
+    };
+    input.addEventListener("change", () => save(input.value));
+    document
+      .getElementById(decId)
+      .addEventListener("click", () => save(Number(input.value) - 1));
+    document
+      .getElementById(incId)
+      .addEventListener("click", () => save(Number(input.value) + 1));
   }
 
-  newPerDayInput.addEventListener("change", () => saveNewPerDay(newPerDayInput.value));
-  document
-    .getElementById("new-per-day-dec")
-    .addEventListener("click", () => saveNewPerDay(Number(newPerDayInput.value) - 1));
-  document
-    .getElementById("new-per-day-inc")
-    .addEventListener("click", () => saveNewPerDay(Number(newPerDayInput.value) + 1));
+  wireStepper(newPerDayInput, "new-per-day-dec", "new-per-day-inc", "newPerDay", 0, 10);
+  wireStepper(rolloverInput, "rollover-dec", "rollover-inc", "rolloverHour", 0, 12);
 
   store.onChange(render);
   render();

@@ -152,7 +152,7 @@
     return { host, root };
   }
 
-  function buildReviewCard(pick, isNew = false) {
+  function buildReviewCard(pick, isNew = false, { showTags = true } = {}) {
     const { host, root } = makeHost();
 
     const link = document.createElement("a");
@@ -200,11 +200,15 @@
 
     const sub = document.createElement("div");
     sub.className = "sub";
-    for (const t of pick.tags || []) {
-      const chip = document.createElement("span");
-      chip.className = "chip";
-      chip.textContent = t;
-      sub.append(chip);
+    // Topic tags can spoil the approach before the problem is attempted, so
+    // they're optional (settings.showTags).
+    if (showTags) {
+      for (const t of pick.tags || []) {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = t;
+        sub.append(chip);
+      }
     }
     sub.append(
       pick.reps === 0
@@ -464,7 +468,7 @@
 
       let host;
       if (pick) {
-        host = buildReviewCard(pick, pick.isNew);
+        host = buildReviewCard(pick, pick.isNew, { showTags: settings.showTags !== false });
       } else if (slugs.length === 0) {
         host = buildOnboardingCard(settings, deckName);
       } else {

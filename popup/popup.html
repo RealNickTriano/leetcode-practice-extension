@@ -46,11 +46,31 @@
   </label>
   <label class="setting">
     <span>
+      <span class="setting-name">Day rollover hour</span>
+      <span class="setting-desc">The next day starts at this hour, not midnight —
+        reviews just after midnight still count as the previous day.</span>
+    </span>
+    <span class="stepper">
+      <button type="button" id="rollover-dec" aria-label="Earlier day rollover">−</button>
+      <input type="number" id="set-rollover-hour" class="num-input" min="0" max="12" step="1">
+      <button type="button" id="rollover-inc" aria-label="Later day rollover">+</button>
+    </span>
+  </label>
+  <label class="setting">
+    <span>
       <span class="setting-name">Reset code on review</span>
       <span class="setting-desc">When you open a due or new deck problem, reset the editor
         to the default template so your old solution stays hidden.</span>
     </span>
     <input type="checkbox" id="set-reset-code" class="switch">
+  </label>
+  <label class="setting">
+    <span>
+      <span class="setting-name">Show topic tags</span>
+      <span class="setting-desc">Show the problem's topic tags on the review card.
+        Turn off if knowing the topic spoils the recall.</span>
+    </span>
+    <input type="checkbox" id="set-show-tags" class="switch">
   </label>
 </section>
 

@@ -100,6 +100,23 @@ test("addDays crosses month boundaries", () => {
   assert.equal(SM2.addDays("2026-06-28", 6), "2026-07-04");
 });
 
+test("today rolls over at the given hour, not midnight", () => {
+  const lateNight = new Date("2026-06-12T02:30:00");
+  assert.equal(SM2.today(lateNight, 4), "2026-06-11"); // still "yesterday"
+  assert.equal(SM2.today(lateNight, 0), "2026-06-12"); // midnight rollover
+  const morning = new Date("2026-06-12T05:00:00");
+  assert.equal(SM2.today(morning, 4), "2026-06-12");
+});
+
+test("the rollover hour never shifts addDays — it's exact date math", () => {
+  SM2.setRolloverHour(12);
+  try {
+    assert.equal(SM2.addDays("2026-06-28", 1), "2026-06-29");
+  } finally {
+    SM2.setRolloverHour(SM2.DEFAULT_ROLLOVER_HOUR);
+  }
+});
+
 test("daysBetween", () => {
   assert.equal(SM2.daysBetween("2026-06-01", "2026-06-11"), 10);
   assert.equal(SM2.daysBetween("2026-06-11", "2026-06-01"), -10);

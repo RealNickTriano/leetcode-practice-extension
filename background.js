@@ -5,14 +5,18 @@
 // transactions, and concurrent writers would clobber each other.
 importScripts("lib/sm2.js", "lib/store.js");
 
-const store = globalThis.LeetcodeAnki.store;
+const { store, settingsReady } = globalThis.LeetcodeAnki;
 const METHODS = new Set(Object.keys(store));
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (!msg || msg.type !== "leetcode-anki:store" || !METHODS.has(msg.method)) {
     return false;
   }
-  store[msg.method](...(msg.args || [])).then(
+  // Wait for the day-rollover hour to be synced from settings on a cold
+  // worker start — store ops stamp dates with SM2.today().
+  settingsReady
+    .then(() => store[msg.method](...(msg.args || [])))
+    .then(
     (result) => sendResponse({ ok: true, result }),
     (e) => sendResponse({ ok: false, error: e instanceof Error ? e.message : String(e) })
   );
