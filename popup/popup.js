@@ -13,6 +13,7 @@
   const nameInput = document.getElementById("namedeck-name");
   const nameConfirm = document.getElementById("namedeck-confirm");
   const resetCodeSwitch = document.getElementById("set-reset-code");
+  const newPerDayInput = document.getElementById("set-new-per-day");
 
   // Destructive buttons take two clicks: the first arms ("sure?"), the
   // second within 2.5s fires; otherwise the button disarms itself.
@@ -120,6 +121,7 @@
     currentDeckName = deckName;
 
     resetCodeSwitch.checked = settings.resetCode !== false;
+    newPerDayInput.value = settings.newPerDay;
 
     deckSelect.replaceChildren(
       ...Object.entries(decks).map(([id, d]) => {
@@ -250,6 +252,22 @@
   resetCodeSwitch.addEventListener("change", () => {
     store.updateSettings({ resetCode: resetCodeSwitch.checked });
   });
+
+  // Clamp to a whole number in [0, 10] and write the clamped value back so
+  // the field always shows what was saved.
+  function saveNewPerDay(value) {
+    const n = Math.max(0, Math.min(10, Math.floor(Number(value)) || 0));
+    newPerDayInput.value = n;
+    store.updateSettings({ newPerDay: n });
+  }
+
+  newPerDayInput.addEventListener("change", () => saveNewPerDay(newPerDayInput.value));
+  document
+    .getElementById("new-per-day-dec")
+    .addEventListener("click", () => saveNewPerDay(Number(newPerDayInput.value) - 1));
+  document
+    .getElementById("new-per-day-inc")
+    .addEventListener("click", () => saveNewPerDay(Number(newPerDayInput.value) + 1));
 
   store.onChange(render);
   render();

@@ -34,6 +34,18 @@
 <section class="settings" aria-label="Settings">
   <label class="setting">
     <span>
+      <span class="setting-name">New cards per day</span>
+      <span class="setting-desc">How many problems from the new queue are introduced
+        each day. Due reviews always come first; 0 pauses new cards entirely.</span>
+    </span>
+    <span class="stepper">
+      <button type="button" id="new-per-day-dec" aria-label="Fewer new cards per day">−</button>
+      <input type="number" id="set-new-per-day" class="num-input" min="0" max="10" step="1">
+      <button type="button" id="new-per-day-inc" aria-label="More new cards per day">+</button>
+    </span>
+  </label>
+  <label class="setting">
+    <span>
       <span class="setting-name">Reset code on review</span>
       <span class="setting-desc">When you open a due or new deck problem, reset the editor
         to the default template so your old solution stays hidden.</span>

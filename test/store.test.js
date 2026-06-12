@@ -107,11 +107,11 @@ test("removeCard deletes the card, leaves the log", async () => {
 
 test("updateSettings merges partial changes", async () => {
   const store = createStore(memoryBackend(), SM2);
-  const settings = await store.updateSettings({ sourceList: "blind-75" });
-  assert.equal(settings.sourceList, "blind-75");
-  assert.equal(settings.newPerDay, 1); // defaults preserved
+  const settings = await store.updateSettings({ newPerDay: 3 });
+  assert.equal(settings.newPerDay, 3);
+  assert.equal(settings.resetCode, true); // defaults preserved
   const s = await store.load();
-  assert.equal(s.settings.sourceList, "blind-75");
+  assert.equal(s.settings.newPerDay, 3);
 });
 
 // Like real chrome.storage: values are copied (not shared references) and

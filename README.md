@@ -29,7 +29,8 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
   stale or premium-only slugs are skipped automatically
 - ✅ Popup: deck browser (due → new queue → scheduled) and a multi-deck
   switcher with create/rename/delete; one deck is selected at a time
-- ⬜ Phase 4 remaining: stats, settings UI, and JSON export/import
+- ✅ Settings tab in the popup: reset-code-on-review toggle and new-cards-per-day
+- ⬜ Phase 4 remaining: stats and JSON export/import
 
 ## Try it
 

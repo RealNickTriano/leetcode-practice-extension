@@ -100,6 +100,51 @@ body[data-tab="deck"] .settings { display: none; }
   color: #8a8478;
 }
 
+/* Number stepper: the native spin buttons are unthemeable browser chrome,
+   so they're hidden and replaced with the −/+ buttons around the field. */
+.stepper {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.stepper button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  width: 26px;
+  background: #262320;
+  border: 1px solid #3a362f;
+  color: #b5ad9d;
+  cursor: pointer;
+  padding: 0;
+}
+
+.stepper button:first-child { border-radius: 6px 0 0 6px; border-right: none; }
+.stepper button:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+.stepper button:hover { background: #2c2823; color: #ffb858; }
+
+.num-input {
+  width: 34px;
+  font-family: inherit;
+  font-size: 12px;
+  color: #e8e2d6;
+  background: #1c1a17;
+  border: 1px solid #3a362f;
+  border-radius: 0;
+  padding: 5px 0;
+  text-align: center;
+  appearance: textfield;
+}
+
+.num-input::-webkit-outer-spin-button,
+.num-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.num-input:focus { outline: none; border-color: #e8930c; }
+
 .switch {
   appearance: none;
   flex-shrink: 0;
