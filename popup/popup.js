@@ -105,7 +105,7 @@
     div.append(
       b,
       document.createElement("br"),
-      "Visit the LeetCode problems page to import your solve history, " +
+      "Visit the LeetCode problems page to start a curated list, " +
         "or open any problem and click “+ Add to Leetcode Anki”."
     );
     return div;

@@ -234,7 +234,7 @@
   function buildOnboardingCard(settings, deckName) {
     const { host, card } = buildMessageCard(
       `deck “${deckName}” is empty.`,
-      "Import your LeetCode solve history, or start a curated list from problem one."
+      "Start a curated list from problem one, or add problems with the “+” on any row."
     );
 
     const actions = document.createElement("div");
@@ -243,29 +243,10 @@
       for (const b of actions.querySelectorAll("button")) b.disabled = disabled;
     };
 
-    const importBtn = document.createElement("button");
-    importBtn.className = "act";
-    importBtn.textContent = "Import my solved problems";
-    importBtn.addEventListener("click", async () => {
-      setAllDisabled(true);
-      importBtn.textContent = "importing…";
-      try {
-        const solved = await api.fetchSolvedQuestions();
-        const added = await store.seedCards(solved);
-        // added > 0 triggers store.onChange, which re-renders this card.
-        if (added === 0) importBtn.textContent = "no solved problems found";
-      } catch (e) {
-        importBtn.textContent =
-          e.message === "not-signed-in" ? "sign in to LeetCode first" : "import failed — try again";
-        setAllDisabled(false);
-      }
-    });
-    actions.append(importBtn);
-
     // One "add the whole list" button per bundled source list.
     for (const [key, source] of Object.entries(Lists)) {
       const btn = document.createElement("button");
-      btn.className = "act ghost";
+      btn.className = "act";
       btn.textContent = `Add ${source.name} · ${source.slugs.length} problems`;
       btn.addEventListener("click", async () => {
         setAllDisabled(true);

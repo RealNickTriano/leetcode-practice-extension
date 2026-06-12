@@ -3,7 +3,7 @@
 Spaced-repetition practice for LeetCode — Anki, but the cards are problems.
 When you visit `leetcode.com/problemset/`, the extension pins a "Due Today"
 review card above the problem list, chosen by an SM-2 scheduler from your
-solve history.
+review history.
 
 Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
 
@@ -23,9 +23,8 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
   null`, ordered). The picker is two-stage — due reviews always win; otherwise
   the next new card is surfaced, capped at `newPerDay` (default 1). Skipping
   days never fakes an overdue backlog.
-- ✅ First-run onboarding on the problemset page: import your full solve
-  history via LeetCode's GraphQL, or add an entire curated list — either way
-  everything lands in the new queue in order
+- ✅ First-run onboarding on the problemset page: add an entire curated
+  list in one click — everything lands in the new queue in order
 - ✅ NeetCode 150 and Blind 75 bundled as source lists (`lib/lists.js`);
   stale or premium-only slugs are skipped automatically
 - ✅ Popup: deck browser (due → new queue → scheduled) and a multi-deck
@@ -89,7 +88,7 @@ lib/select.js            pickToday(deck) → most-overdue due card
 lib/store.js             deck persistence over chrome.storage.local
 lib/selectors.js         every LeetCode DOM selector, with fallback chains
 lib/lists.js             NeetCode 150 + Blind 75 source lists, in study order
-lib/api.js               LeetCode GraphQL: question metadata, solve history
+lib/api.js               LeetCode GraphQL: question metadata
 test/                    node:test suites for scheduler + store
 PLAN.html                full project plan (open in a browser)
 ```

@@ -32,9 +32,8 @@ solving one again from scratch.
 
 - **One problem a day, where you already are.** No separate app or dashboard
   — the recommendation lives at the top of the problems page.
-- **Build your deck in one click.** Import your entire solve history, add
-  NeetCode 150 or Blind 75 whole, hit "+" on any problem row, or add from the
-  problem page itself.
+- **Build your deck in one click.** Add NeetCode 150 or Blind 75 whole, hit
+  "+" on any problem row, or add from the problem page itself.
 - **A real new-card queue.** Lists join the deck unscheduled and are
   introduced one per day. Skip a week and nothing rots — your real reviews
   come first, then the queue resumes.

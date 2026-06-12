@@ -1,6 +1,6 @@
 # Privacy Policy — Leetcode Anki
 
-_Last updated: June 11, 2026_
+_Last updated: June 12, 2026_
 
 Leetcode Anki is a browser extension that adds spaced-repetition practice
 scheduling to leetcode.com.
@@ -26,10 +26,9 @@ This data never leaves your browser. Uninstalling the extension deletes it.
 
 The extension runs only on leetcode.com. It makes requests solely to
 LeetCode's own API (`leetcode.com/graphql`), using your existing LeetCode
-session, to read problem metadata (title, difficulty, topic tags) and — only
-if you use the optional import feature — the list of problems your account
-has solved. The responses are stored locally as described above and are not
-sent anywhere else. No requests are made to any other domain.
+session, to read problem metadata (title, difficulty, topic tags). The
+responses are stored locally as described above and are not sent anywhere
+else. No requests are made to any other domain.
 
 ## Permissions
 
