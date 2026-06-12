@@ -438,8 +438,44 @@
 
   // ---------- accepted detection ----------
 
+  // Two steps: (1) the user submits — the Submit click (or Ctrl/Cmd+Enter)
+  // arms a verdict watch for a few minutes; (2) the Accepted verdict newly
+  // appears while armed. Step 1 is what keeps the submission-history table —
+  // whose old rows also read "Accepted" — from triggering the overlay just
+  // by opening the Submissions tab.
+  const SUBMIT_WINDOW_MS = 3 * 60 * 1000; // judging can be slow; expire eventually
+
+  let armedAt = 0; // 0 = not watching for a verdict
   let verdictWasVisible = false;
+  let failedWasVisible = false;
   let promptedSlug = null; // at most one rating prompt per page visit
+
+  function armVerdictWatch() {
+    if (!slugFromPath()) return;
+    armedAt = Date.now();
+    // Snapshot what's on screen now, so only a *fresh* verdict (an edge)
+    // counts — either way. A leftover Accepted must not fire the prompt,
+    // and a leftover Wrong Answer from the previous attempt must not
+    // disarm the watch for this one.
+    verdictWasVisible = !!Selectors.findAcceptedVerdict();
+    failedWasVisible = !!Selectors.findFailedVerdict();
+  }
+
+  // Capture phase, so LeetCode's own handlers can't stop the event first.
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (Selectors.isSubmitButton(e.target)) armVerdictWatch();
+    },
+    true
+  );
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) armVerdictWatch();
+    },
+    true
+  );
 
   async function maybePrompt() {
     const slug = slugFromPath();
@@ -454,8 +490,28 @@
   }
 
   function checkVerdict() {
+    if (armedAt === 0) return;
+    if (Date.now() - armedAt > SUBMIT_WINDOW_MS) {
+      armedAt = 0;
+      return;
+    }
+    // A *fresh* failed verdict ends this submission — disarm so old
+    // "Accepted" rows in the history table can't fire later within the
+    // window. Edge-based, like the Accepted check: a stale Wrong Answer
+    // still on screen from the previous attempt doesn't count.
+    const failed = !!Selectors.findFailedVerdict();
+    if (failed && !failedWasVisible) {
+      armedAt = 0;
+      failedWasVisible = failed;
+      return;
+    }
+    failedWasVisible = failed;
+
     const visible = !!Selectors.findAcceptedVerdict();
-    if (visible && !verdictWasVisible) maybePrompt();
+    if (visible && !verdictWasVisible) {
+      armedAt = 0;
+      maybePrompt();
+    }
     verdictWasVisible = visible;
   }
 
@@ -473,6 +529,8 @@
         lastSlug = slug;
         promptedSlug = null;
         verdictWasVisible = false;
+        failedWasVisible = false;
+        armedAt = 0; // a pending submission doesn't follow you to another problem
         removeOverlay();
         renderPill();
         if (slug) queueDraftReset(slug);
