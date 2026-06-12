@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Leetcode Anki",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "Spaced-repetition practice for LeetCode — Anki, but the cards are problems.",
   "permissions": ["storage"],
   "background": {

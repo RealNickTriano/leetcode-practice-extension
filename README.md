@@ -54,7 +54,7 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
 ## Releasing
 
 `npm run package` runs the full test suite and then builds
-`leetcode-anki-<version>.zip` (a red test blocks the package). The zip
+`builds/leetcode-anki-<version>.zip` (a red test blocks the package). The zip
 contains exactly what the manifest references — `manifest.json` and
 `background.js` at the root, `content/`, `lib/`, `popup/`, and the four
 icon PNGs. Tests, docs, configs,
