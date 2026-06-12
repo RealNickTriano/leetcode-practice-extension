@@ -20,12 +20,13 @@
 <div class="deckbar">
   <select id="deck-select" aria-label="Selected deck"></select>
   <button id="deck-new" title="New deck">+ new</button>
+  <button id="deck-rename" title="Rename this deck">rename</button>
   <button id="deck-del" title="Delete this deck">delete</button>
 </div>
 
-<div class="newdeck hidden" id="newdeck-row">
-  <input id="newdeck-name" placeholder="deck name…" maxlength="40">
-  <button id="newdeck-create">create</button>
+<div class="newdeck hidden" id="namedeck-row">
+  <input id="namedeck-name" placeholder="deck name…" maxlength="40">
+  <button id="namedeck-confirm">create</button>
 </div>
 
 <main id="list" aria-label="Deck"></main>

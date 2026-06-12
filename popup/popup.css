@@ -172,6 +172,14 @@ body[data-tab="deck"] .settings { display: none; }
 
 .deckbar button:hover, .newdeck button:hover { background: rgba(232, 147, 12, 0.28); }
 
+.deckbar button#deck-rename {
+  background: none;
+  border-color: #3a362f;
+  color: #8a8478;
+}
+
+.deckbar button#deck-rename:hover { border-color: #e8930c; color: #ffb858; }
+
 .deckbar button#deck-del {
   background: none;
   border-color: #3a362f;

@@ -7,10 +7,11 @@
   const listEl = document.getElementById("list");
   const deckSelect = document.getElementById("deck-select");
   const deckNewBtn = document.getElementById("deck-new");
+  const deckRenameBtn = document.getElementById("deck-rename");
   const deckDelBtn = document.getElementById("deck-del");
-  const newDeckRow = document.getElementById("newdeck-row");
-  const newDeckName = document.getElementById("newdeck-name");
-  const newDeckCreate = document.getElementById("newdeck-create");
+  const nameRow = document.getElementById("namedeck-row");
+  const nameInput = document.getElementById("namedeck-name");
+  const nameConfirm = document.getElementById("namedeck-confirm");
   const resetCodeSwitch = document.getElementById("set-reset-code");
 
   // Destructive buttons take two clicks: the first arms ("sure?"), the
@@ -111,9 +112,12 @@
     return div;
   }
 
+  let currentDeckName = ""; // prefill for the rename row
+
   async function render() {
-    const { deck, decks, deckId, settings } = await store.load();
+    const { deck, decks, deckId, deckName, settings } = await store.load();
     const today = SM2.today();
+    currentDeckName = deckName;
 
     resetCodeSwitch.checked = settings.resetCode !== false;
 
@@ -168,28 +172,57 @@
     deckDelBtn.textContent = "delete";
   }
 
-  deckSelect.addEventListener("change", () => store.selectDeck(deckSelect.value));
-
-  deckNewBtn.addEventListener("click", () => {
-    newDeckRow.classList.toggle("hidden");
-    if (!newDeckRow.classList.contains("hidden")) newDeckName.focus();
+  deckSelect.addEventListener("change", () => {
+    closeNameRow(); // a rename prefill for the old deck would be stale
+    store.selectDeck(deckSelect.value);
   });
 
-  async function createDeck() {
-    const name = newDeckName.value.trim();
-    if (!name) {
-      newDeckName.focus();
-      return;
-    }
-    newDeckName.value = "";
-    newDeckRow.classList.add("hidden");
-    await store.createDeck(name); // also selects it; onChange re-renders
+  // One input row serves both "new deck" and "rename deck": the mode picks
+  // the confirm label, the prefill, and which store call commits it.
+  let nameMode = null; // "create" | "rename" | null (row hidden)
+
+  function openNameRow(mode) {
+    nameMode = mode;
+    nameRow.classList.remove("hidden");
+    nameConfirm.textContent = mode === "rename" ? "rename" : "create";
+    nameInput.value = mode === "rename" ? currentDeckName : "";
+    nameInput.focus();
+    nameInput.select();
   }
 
-  newDeckCreate.addEventListener("click", createDeck);
-  newDeckName.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") createDeck();
-    if (e.key === "Escape") newDeckRow.classList.add("hidden");
+  function closeNameRow() {
+    nameMode = null;
+    nameRow.classList.add("hidden");
+  }
+
+  // Clicking a mode's own button again closes the row; clicking the other
+  // button switches modes.
+  deckNewBtn.addEventListener("click", () =>
+    nameMode === "create" ? closeNameRow() : openNameRow("create")
+  );
+  deckRenameBtn.addEventListener("click", () =>
+    nameMode === "rename" ? closeNameRow() : openNameRow("rename")
+  );
+
+  async function confirmName() {
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameInput.focus();
+      return;
+    }
+    const mode = nameMode;
+    closeNameRow();
+    if (mode === "rename") {
+      await store.renameDeck(deckSelect.value, name); // onChange re-renders
+    } else {
+      await store.createDeck(name); // also selects it; onChange re-renders
+    }
+  }
+
+  nameConfirm.addEventListener("click", confirmName);
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") confirmName();
+    if (e.key === "Escape") closeNameRow();
   });
 
   // Deleting a whole deck is destructive, so it takes two clicks: the first
@@ -202,6 +235,7 @@
       return;
     }
     disarmDelete();
+    closeNameRow(); // a rename prefill for the deleted deck would be stale
     await store.deleteDeck(deckSelect.value); // onChange re-renders
   });
 
