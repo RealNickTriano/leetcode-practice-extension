@@ -1,5 +1,7 @@
 # Leetcode Anki
 
+[**Add Leetcode Anki from the Chrome Web Store**](https://chromewebstore.google.com/detail/leetcode-anki/naphikahngndnjggbhdaeclceakpijca)
+
 **Spaced repetition for LeetCode. Your solves become flashcards — one problem a
 day, scheduled right before you'd forget it.**
 
@@ -40,10 +42,6 @@ how you'll still know it in the interview.
 - **Private by design.** Your deck lives in your browser's local storage. No
   account, no server, no tracking. The extension only runs on `leetcode.com`.
   See [`PRIVACY.md`](PRIVACY.md).
-
-## Install
-
-[**Add Leetcode Anki from the Chrome Web Store**](https://chromewebstore.google.com/detail/leetcode-anki/naphikahngndnjggbhdaeclceakpijca)
 
 ## Privacy
 
