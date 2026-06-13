@@ -1,107 +1,51 @@
 # Leetcode Anki
 
-Spaced-repetition practice for LeetCode — Anki, but the cards are problems.
-When you visit `leetcode.com/problemset/`, the extension pins a "Due Today"
-review card above the problem list, chosen by an SM-2 scheduler from your
-review history.
+**Spaced repetition for LeetCode. Your solves become flashcards — one problem a
+day, scheduled right before you'd forget it.**
 
-Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
+Solving a problem once means you knew it that day. Leetcode Anki turns LeetCode
+into a spaced-repetition deck — the same way Anki works for flashcards, except
+the cards are problems and a "review" means solving one again from scratch. It's
+how you'll still know it in the interview.
 
-## Status: Phase 3
+## How it works
 
-- ✅ Manifest V3 scaffold
-- ✅ SM-2 scheduling core (`lib/sm2.js`) and deck selection (`lib/select.js`), unit-tested
-- ✅ Content script that finds the problem list (MutationObserver + SPA-nav
-  handling) and injects a shadow-DOM review card
-- ✅ Deck persistence in `chrome.storage.local` (`lib/store.js`, unit-tested
-  against an in-memory backend)
-- ✅ Problem pages: "+ Add to Leetcode Anki" pill, Accepted-verdict detection, and
-  the Again/Hard/Good/Easy rating overlay with live interval previews
-- ✅ The problemset card now reads the real deck: most-overdue card first,
-  with "deck is empty" / "all caught up" states
-- ✅ Anki-style new queue: cards enter the deck **unscheduled** (`dueDate:
-  null`, ordered). The picker is two-stage — due reviews always win; otherwise
-  the next new card is surfaced, capped at `newPerDay` (default 1). Skipping
-  days never fakes an overdue backlog.
-- ✅ First-run onboarding on the problemset page: add an entire curated
-  list in one click — everything lands in the new queue in order
-- ✅ NeetCode 150 and Blind 75 bundled as source lists (`lib/lists.js`);
-  stale or premium-only slugs are skipped automatically
-- ✅ Popup: deck browser (due → new queue → scheduled) and a multi-deck
-  switcher with create/rename/delete; one deck is selected at a time
-- ✅ Settings tab in the popup: reset-code-on-review and show-topic-tags
-  toggles, new-cards-per-day, and day rollover hour (Anki-style "next day
-  starts at 4am"; default midnight)
-- ✅ JSON backup: export/import the full state (decks, review log, settings)
-  from the popup's settings tab — importing replaces local state
-- ✅ Stats tab in the popup: deck maturity (new/learning/mature) and a 7-day
-  due forecast; ratings now also log the interval that was tested
-- ⬜ Phase 4 remaining: more stats (pass rate, trouble problems, weak topics)
+1. **Visit the LeetCode problems page.** One recommended problem is pinned above
+   the list: your most overdue review, or the next new problem from your queue.
+2. **Solve it.** When the Accepted verdict appears, rate the recall — Again,
+   Hard, Good, or Easy.
+3. **The scheduler does the rest.** Using SM-2 (Anki's algorithm), the next
+   review is pushed out on an expanding schedule: a day, six days, two weeks, a
+   month. Problems you find easy fade into the future; problems that hurt come
+   back soon.
 
-## Try it
+## Features
 
-1. Open `chrome://extensions`, enable **Developer mode**.
-2. Click **Load unpacked** and select this directory.
-3. Open any problem on LeetCode and click the **"⟳ + Add to Leetcode Anki"** pill
-   (bottom-right). The card is due immediately.
-4. Visit <https://leetcode.com/problemset/> — the orange "Leetcode Anki · Due Today"
-   card shows your most overdue problem.
-5. Solve it. When the **Accepted** verdict appears, the rating overlay slides
-   in — grade the recall (Again / Hard / Good / Easy) and the next review date
-   is scheduled. The problemset card updates to the next due problem, or
-   "all caught up".
+- **One problem a day, where you already are.** No separate app or dashboard —
+  the recommendation lives at the top of the LeetCode problems page.
+- **Build your deck in one click.** Add NeetCode 150 or Blind 75 whole, hit "+"
+  on any problem row, or add from the problem page itself.
+- **A real new-card queue.** Lists join the deck unscheduled and are introduced
+  one per day. Skip a week and nothing rots — your real reviews come first, then
+  the queue resumes.
+- **Honest reviews.** Opening a due problem resets the editor to the default
+  template, so you recall the solution instead of rereading it.
+- **Multiple decks.** Separate decks for NeetCode, interview prep, or weak
+  topics — each problem schedules independently per deck.
+- **Stats at a glance.** A popup dashboard shows deck maturity (new / learning /
+  mature) and a 7-day forecast of what's coming due.
+- **Private by design.** Your deck lives in your browser's local storage. No
+  account, no server, no tracking. The extension only runs on `leetcode.com`.
+  See [`PRIVACY.md`](PRIVACY.md).
 
-## Releasing
+## Install
 
-`npm run package` runs the full test suite and then builds
-`builds/leetcode-anki-<version>.zip` (a red test blocks the package). The zip
-contains exactly what the manifest references — `manifest.json` and
-`background.js` at the root, `content/`, `lib/`, `popup/`, and the four
-icon PNGs. Tests, docs, configs,
-the icon-source SVG, and `node_modules` are excluded; built zips are
-gitignored.
+[**Add Leetcode Anki from the Chrome Web Store**](https://chromewebstore.google.com/detail/leetcode-anki/naphikahngndnjggbhdaeclceakpijca)
 
-Notes:
+## Privacy
 
-- **Installing from the zip** — Chrome doesn't load zips directly for
-  personal use: either keep using Load Unpacked on this folder, or upload the
-  zip to the Chrome Web Store developer dashboard ($5 one-time registration),
-  where it can be published unlisted/private.
-- **Web Store review** — expect pushback on the name "Leetcode Anki" (two
-  third-party trademarks), and have a justification ready for the
-  `leetcode.com` host permission. Unlisted listings get the same review as
-  public ones.
-- **Version bumps** — update `version` in both `manifest.json` and
-  `package.json` (keep them in sync); the zip name picks up the version
-  automatically.
-- Store listing copy lives in [`STORE.md`](STORE.md).
+Everything stays on your machine. There's no account and no server — your deck,
+review history, and settings live in your browser's local storage, and the
+extension only has access to `leetcode.com`. Full details in
+[`PRIVACY.md`](PRIVACY.md).
 
-## Run the tests
-
-```sh
-npm test        # or: node --test
-```
-
-The scheduler is pure functions with no DOM or `chrome.*` dependencies, so it
-runs under plain Node.
-
-## Layout
-
-```
-manifest.json            MV3 manifest
-background.js            service worker — owns all storage writes
-content/problemset.js    finds the problem list, injects the review card
-content/problem.js       add-to-deck pill, Accepted detection, rating overlay
-lib/sm2.js               SM-2: rate(card, grade) → card′
-lib/select.js            pickToday(deck) → most-overdue due card
-lib/store.js             deck persistence over chrome.storage.local
-lib/stats.js             deck maturity buckets + due-date forecast
-lib/selectors.js         every LeetCode DOM selector, with fallback chains
-lib/lists.js             NeetCode 150 + Blind 75 source lists, in study order
-lib/api.js               LeetCode GraphQL: question metadata
-test/                    node:test suites for scheduler + store
-PLAN.html                full project plan (open in a browser)
-```
-
-`lib/*.js` files load both as content-script globals (`Leetcode Anki.SM2`,
-`Leetcode Anki.Select`) and as Node modules for the tests.
