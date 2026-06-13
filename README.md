@@ -8,6 +8,9 @@ into a spaced-repetition deck — the same way Anki works for flashcards, except
 the cards are problems and a "review" means solving one again from scratch. It's
 how you'll still know it in the interview.
 
+<img width="1280" height="800" alt="image" src="https://github.com/user-attachments/assets/33c59c57-e2c8-42fb-a7dd-acf4e566b2cb" />
+
+
 ## How it works
 
 1. **Visit the LeetCode problems page.** One recommended problem is pinned above
