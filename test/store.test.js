@@ -57,6 +57,89 @@ test("rateCard on an unknown slug throws", async () => {
   await assert.rejects(() => store.rateCard("nope", "good", DAY), /not in deck/);
 });
 
+test("re-rating a not-yet-due card corrects it instead of compounding", async () => {
+  const store = createStore(memoryBackend(), SM2);
+  await store.addCard("two-sum", META, DAY);
+  await store.rateCard("two-sum", "good", DAY); // due DAY+1, not yet due
+  const corrected = await store.rateCard("two-sum", "easy", DAY);
+
+  // Identical to a single "easy" on the brand-new card.
+  assert.equal(corrected.reps, 1);
+  assert.equal(corrected.intervalDays, 4);
+  assert.equal(corrected.dueDate, "2026-06-15"); // DAY + 4
+  assert.equal(corrected.lastGrade, "easy");
+
+  const { reviewLog } = await store.load();
+  assert.equal(reviewLog.length, 1); // the "good" row was replaced, not appended
+  assert.deepEqual(reviewLog, [
+    { slug: "two-sum", date: DAY, grade: "easy", deckId: "default", intervalDays: 0 },
+  ]);
+});
+
+test("correction keeps the original review date even a day later", async () => {
+  const store = createStore(memoryBackend(), SM2);
+  await store.addCard("two-sum", META, DAY);
+  await store.rateCard("two-sum", "easy", DAY); // due DAY+4
+  const next = "2026-06-12"; // DAY + 1; card still not due (DAY+4 > DAY+1)
+  const corrected = await store.rateCard("two-sum", "hard", next);
+
+  // Rebuilt from the new card on the *original* date, not `next`.
+  assert.equal(corrected.intervalDays, 1); // reps 0 + hard
+  assert.equal(corrected.dueDate, "2026-06-12"); // DAY + 1, off DAY
+  const { reviewLog } = await store.load();
+  assert.equal(reviewLog.length, 1);
+  assert.equal(reviewLog[0].date, DAY);
+  assert.equal(reviewLog[0].grade, "hard");
+});
+
+test("rating a card that is due again is a fresh review, not a correction", async () => {
+  const store = createStore(memoryBackend(), SM2);
+  await store.addCard("two-sum", META, DAY);
+  await store.rateCard("two-sum", "good", DAY); // due DAY+1
+  const next = "2026-06-12"; // DAY + 1 — card is due
+  const second = await store.rateCard("two-sum", "good", next);
+
+  assert.equal(second.reps, 2); // advanced from the prior review, not reset
+  const { reviewLog } = await store.load();
+  assert.equal(reviewLog.length, 2); // appended, not replaced
+});
+
+test("corrections are repeatable (fixing a fix)", async () => {
+  const store = createStore(memoryBackend(), SM2);
+  await store.addCard("two-sum", META, DAY);
+  await store.rateCard("two-sum", "good", DAY);
+  await store.rateCard("two-sum", "easy", DAY);
+  const corrected = await store.rateCard("two-sum", "again", DAY);
+
+  // Equal to a single "again" on the brand-new card.
+  assert.equal(corrected.reps, 0);
+  assert.equal(corrected.dueDate, "2026-06-12"); // DAY + 1
+  assert.equal(corrected.lastGrade, "again");
+  const { reviewLog } = await store.load();
+  assert.equal(reviewLog.length, 1);
+  assert.equal(reviewLog[0].grade, "again");
+});
+
+test("a future-due card without prevReview rates as a new review", async () => {
+  const backend = memoryBackend();
+  const s = createStore(backend, SM2);
+  await s.addCard("two-sum", META, DAY);
+  // Simulate a legacy card: scheduled into the future but lacking prevReview.
+  const raw = await backend.get(["decks"]);
+  raw.decks.default.cards["two-sum"] = {
+    ...raw.decks.default.cards["two-sum"],
+    intervalDays: 6,
+    reps: 2,
+    dueDate: "2026-06-20",
+  };
+  await backend.set({ decks: raw.decks });
+
+  const rated = await s.rateCard("two-sum", "good", DAY);
+  assert.equal(rated.reps, 3); // advanced from current state — new review
+  const { reviewLog } = await s.load();
+  assert.equal(reviewLog.length, 1);
+});
+
 test("seedCards adds unscheduled cards in queue order", async () => {
   const store = createStore(memoryBackend(), SM2);
   const added = await store.seedCards(

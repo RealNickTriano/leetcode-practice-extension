@@ -79,26 +79,32 @@
       vertical-align: middle;
       margin-left: 10px;
     }
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bar.inline { font-size: 11px; }
+    .bar.floating {
+      position: fixed;
+      right: 18px;
+      top: 64px;
+      z-index: 999999;
+      font-size: 12px;
+    }
     .panel {
       display: flex;
       align-items: center;
       gap: 8px;
       white-space: nowrap;
+      font-size: inherit;
     }
-    .panel.inline {
+    .bar.inline .panel {
       padding: 4px 10px;
-      font-size: 11px;
       border-radius: 6px;
       box-shadow: none;
     }
-    .panel.floating {
-      position: fixed;
-      right: 18px;
-      top: 64px;
-      z-index: 999999;
-      padding: 8px 14px;
-      font-size: 12px;
-    }
+    .bar.floating .panel { padding: 8px 14px; }
     button.add {
       color: #ffb858;
       font-weight: 600;
@@ -107,6 +113,20 @@
     button.add:hover { color: #ffd49a; }
     .due-label { color: #8a8478; }
     .due-label b { color: #ffb858; font-weight: 600; }
+    button.rate {
+      color: #8a8478;
+      font-weight: 600;
+      font-size: inherit;
+      white-space: nowrap;
+      background: #1c1a17;
+      border: 1px solid #3a362f;
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+    button.rate.cta { color: #ffb858; }
+    button.rate .grade { color: var(--c, #ffb858); }
+    .bar.floating button.rate { padding: 7px 12px; }
+    button.rate:hover { border-color: var(--c, #5c5648); filter: brightness(1.15); }
     button.x {
       color: #5c5648;
       font-size: 13px;
@@ -119,11 +139,11 @@
       font-size: 10px;
       font-weight: 600;
     }
-    button.x { position: relative; }
-    button.x::after {
+    [data-tip] { position: relative; }
+    [data-tip]::after {
       content: attr(data-tip);
       position: absolute;
-      top: calc(100% + 7px);
+      bottom: calc(100% + 7px);
       left: 50%;
       transform: translateX(-50%) scale(0.96);
       background: #262320;
@@ -138,7 +158,7 @@
       transition: opacity 0.12s, transform 0.12s;
       z-index: 50;
     }
-    button.x:hover::after {
+    [data-tip]:hover::after {
       opacity: 1;
       transform: translateX(-50%) scale(1);
     }
@@ -195,8 +215,10 @@
     pillMode = mode;
     const display = anchor ? "inline" : "floating";
     host.dataset.mode = display;
+    const bar = document.createElement("div");
+    bar.className = `bar ${display}`;
     const panel = document.createElement("div");
-    panel.className = `panel ${display}`;
+    panel.className = "panel";
 
     if (!card) {
       const add = document.createElement("button");
@@ -209,6 +231,7 @@
         renderPill();
       });
       panel.append(add);
+      bar.append(panel);
     } else {
       const label = document.createElement("span");
       label.className = "due-label";
@@ -233,9 +256,28 @@
         renderPill();
       });
       panel.append(label, x);
+
+      // Standalone pill beside the deck box, so a rating is one click away
+      // even when submission detection misses (and to re-rate a mistake).
+      const rate = document.createElement("button");
+      rate.className = "rate";
+      const last = GRADE_LABELS.find(([g]) => g === card.lastGrade);
+      if (last) {
+        rate.style.setProperty("--c", last[2]);
+        const grade = document.createElement("span");
+        grade.className = "grade";
+        grade.textContent = last[1];
+        rate.append("Rated: ", grade);
+      } else {
+        rate.classList.add("cta");
+        rate.textContent = "Rate";
+      }
+      rate.dataset.tip = last ? "Re-rate this problem" : "Rate this problem manually";
+      rate.addEventListener("click", () => showOverlay(slug, card));
+      bar.append(panel, rate);
     }
 
-    root.append(panel);
+    root.append(bar);
     if (anchor && anchor.parentElement) {
       anchor.insertAdjacentElement("afterend", host);
     } else {
@@ -355,8 +397,12 @@
 
     const grid = document.createElement("div");
     grid.className = "grid";
+    // Preview each grade off the same basis store.rateCard will use, so a
+    // correction (re-rating a not-yet-due card) shows the interval it actually
+    // produces, not one compounded onto the prior rating.
+    const { base, date } = SM2.reviewBasis(card);
     for (const [grade, label, color] of GRADE_LABELS) {
-      const days = SM2.rate(card, grade).intervalDays;
+      const days = SM2.rate(base, grade, date).intervalDays;
       const btn = document.createElement("button");
       btn.className = "grade";
       btn.style.setProperty("--c", color);
