@@ -45,25 +45,28 @@ clear the extension's storage for the onboarding checks.
       "sure?" first). Pill survives switching Description/Submissions tabs
       and SPA navigation between problems.
 
-## 3. Submission detection (regression-prone — three real bugs lived here)
+## 3. Submission detection (network-based — content/netwatch.js wraps the page's fetch/XHR in the MAIN world and postMessages the verdict)
 
-- [ ] **Plain flow.** Open a due/new deck problem from the Description tab,
-      submit a correct solution. Rating overlay appears once on Accepted.
-- [ ] **Submissions pane open during submit** (regression: missed prompt).
-      Open the Submissions tab — old Accepted rows visible — then submit a
-      correct solution. Overlay still appears (URL pin path).
-- [ ] **Fail then pass within 3 minutes** (regression: watch killed by
-      stale verdict). Submit a wrong solution, then a correct one. Overlay
-      appears on the second submit.
-- [ ] **Browsing only never prompts** (regression: false positive). With a
-      due card's problem open, browse the Submissions tab and open old
-      Accepted submissions without submitting. No overlay.
+- [ ] **Plain flow.** Open a due/new deck problem, submit a correct solution.
+      Rating overlay appears once on Accepted.
+- [ ] **Keyboard submit.** Ctrl/Cmd+Enter instead of the Submit button.
+      Overlay still appears on Accepted (detection is at the network layer, so
+      how you triggered the submit doesn't matter).
+- [ ] **Run never prompts.** Click **Run** (not Submit) with passing sample
+      cases. No overlay — Run uses a different endpoint.
+- [ ] **Failed submit never prompts.** Submit a wrong solution. No overlay.
+- [ ] **Browsing only never prompts.** With a due card's problem open, browse
+      the Submissions tab and open old Accepted submissions without submitting.
+      No overlay (no submit request is made).
+- [ ] **Navigate away before the verdict.** Submit, then immediately switch to
+      a different problem before judging finishes. No overlay on the new
+      problem (the verdict's slug no longer matches the open one).
 - [ ] **Non-deck problem.** Submit an accepted solution on a problem not in
       the deck. No overlay.
 - [ ] **Future-scheduled card.** Rate a card (due in N days), resubmit the
       same problem. No overlay — it's not due.
-- [ ] **Keyboard submit.** Ctrl/Cmd+Enter instead of the Submit button.
-      Overlay appears on Accepted.
+- [ ] **No console errors** from the wrapped fetch/XHR during running,
+      submitting, and ordinary navigation.
 
 ## 4. Review flow
 

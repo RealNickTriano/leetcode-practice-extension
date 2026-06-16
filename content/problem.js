@@ -1,7 +1,8 @@
 // Runs on leetcode.com/problems/<slug>. Three jobs:
 //   1. A floating pill: "+ Add to Leetcode Anki" when the problem isn't in the
 //      deck, or a due-date badge (with remove) when it is.
-//   2. Detect the Accepted verdict after a submission.
+//   2. Receive the Accepted verdict from content/netwatch.js (a MAIN-world
+//      network watcher) over window.postMessage.
 //   3. If the accepted problem is in the deck and due, show the Anki-style
 //      rating overlay and write the grade back through SM-2.
 (function () {
@@ -489,137 +490,43 @@
 
   // ---------- accepted detection ----------
 
-  // Two steps: (1) the user submits — the Submit click (or Ctrl/Cmd+Enter)
-  // arms a verdict watch for a few minutes; (2) the verdict of *that*
-  // submission arrives. Step 1 is what keeps the submission-history table —
-  // whose old rows also read "Accepted" — from triggering the overlay just
-  // by opening the Submissions tab.
-  //
-  // Step 2 has two detection paths. Preferred: submitting navigates to the
-  // new submission's own page (/problems/<slug>/submissions/<id>/), so a
-  // fresh id appearing while armed pins the watch to that submission's
-  // result pane — immune to whatever old verdicts are visible elsewhere.
-  // Fallback (no navigation observed): a fresh visibility edge of the
-  // Accepted text. The edge alone isn't enough: with the Submissions pane
-  // open during submit, old "Accepted" rows keep the text visible the whole
-  // time and no edge ever fires.
-  const SUBMIT_WINDOW_MS = 3 * 60 * 1000; // judging can be slow; expire eventually
-
-  let armedAt = 0; // 0 = not watching for a verdict
-  let submissionIdAtArm = null;
-  let watchedSubmission = null; // set once the new submission's page is seen
-  let verdictWasVisible = false;
-  let failedWasVisible = false;
-  let promptedSlug = null; // at most one rating prompt per page visit
-
-  function submissionIdFromPath() {
-    const m = location.pathname.match(/^\/problems\/[^/]+\/submissions\/(\d+)/);
-    return m ? m[1] : null;
-  }
-
-  function armVerdictWatch() {
-    if (!slugFromPath()) return;
-    armedAt = Date.now();
-    // An id already in the URL is an *old* submission the user was viewing;
-    // only an id different from this one marks the new submission's page.
-    submissionIdAtArm = submissionIdFromPath();
-    watchedSubmission = null;
-    // Snapshot what's on screen now, so only a *fresh* verdict (an edge)
-    // counts — either way. A leftover Accepted must not fire the prompt,
-    // and a leftover Wrong Answer from the previous attempt must not
-    // disarm the watch for this one.
-    verdictWasVisible = !!Selectors.findAcceptedVerdict();
-    failedWasVisible = !!Selectors.findFailedVerdict();
-  }
-
-  // Capture phase, so LeetCode's own handlers can't stop the event first.
-  document.addEventListener(
-    "click",
-    (e) => {
-      if (Selectors.isSubmitButton(e.target)) armVerdictWatch();
-    },
-    true
-  );
-  document.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) armVerdictWatch();
-    },
-    true
-  );
-
-  async function maybePrompt() {
-    const slug = slugFromPath();
-    if (!slug || slug === promptedSlug) return;
+  // The verdict comes from content/netwatch.js, which wraps the page's fetch/
+  // XHR in the MAIN world and postMessages the result of each finished
+  // submission across the world boundary. That's unambiguous — it's *this*
+  // submission's verdict, never an old "Accepted" row in the history table —
+  // and fires exactly once per submission, so all this side has to do is gate
+  // it on the deck/due state. Every accepted submission gets its own prompt:
+  // closing the overlay without rating and submitting again re-prompts (a card
+  // stays promptable until it's actually rated, which schedules it forward).
+  async function maybePrompt(slug) {
+    // Only for the problem currently open: a verdict that lands after you've
+    // navigated to a different problem must not prompt for the old one.
+    if (!slug || slug !== slugFromPath()) return;
     const { deck } = await store.load();
     const card = deck[slug];
     // Prompt for due reviews and for new-queue cards (solving a new card is
     // its introduction, whenever it happens); skip future-scheduled ones.
     if (!card || (card.dueDate != null && card.dueDate > SM2.today())) return;
-    promptedSlug = slug;
     showOverlay(slug, card);
   }
 
-  function checkVerdict() {
-    if (armedAt === 0) return;
-    if (Date.now() - armedAt > SUBMIT_WINDOW_MS) {
-      armedAt = 0;
-      return;
+  // Off in prod; enable with localStorage.setItem("leetcode-anki:debug", "1")
+  // (the same key turns on content/netwatch.js — shared localStorage).
+  const DEBUG = (() => {
+    try {
+      return localStorage.getItem("leetcode-anki:debug") === "1";
+    } catch {
+      return false;
     }
+  })();
 
-    // Preferred path: pin the watch to the new submission's page. Snapshot
-    // the result pane at pin time — right after the navigation it can still
-    // briefly show the previous submission's verdict, which must not count.
-    const id = submissionIdFromPath();
-    if (id && id !== submissionIdAtArm && !watchedSubmission) {
-      const stale = Selectors.findSubmissionResult();
-      watchedSubmission = {
-        id,
-        staleEl: stale,
-        staleText: stale ? stale.textContent.trim() : "",
-      };
-    }
-
-    if (watchedSubmission) {
-      const result = Selectors.findSubmissionResult();
-      // Judging unmounts the old result element, so the new verdict arrives
-      // as a new element (or at least new text). Anything matching the
-      // pin-time snapshot is leftovers — keep waiting.
-      if (
-        !result ||
-        (result === watchedSubmission.staleEl &&
-          result.textContent.trim() === watchedSubmission.staleText)
-      ) {
-        return;
-      }
-      if (result.textContent.trim() === "Accepted") {
-        armedAt = 0;
-        maybePrompt();
-      } else if (Selectors.findFailedVerdict()) {
-        armedAt = 0;
-      }
-      return;
-    }
-
-    // Fallback path: visibility edges. A *fresh* failed verdict ends this
-    // submission — disarm so old "Accepted" rows in the history table can't
-    // fire later within the window. A stale Wrong Answer still on screen
-    // from the previous attempt doesn't count.
-    const failed = !!Selectors.findFailedVerdict();
-    if (failed && !failedWasVisible) {
-      armedAt = 0;
-      failedWasVisible = failed;
-      return;
-    }
-    failedWasVisible = failed;
-
-    const visible = !!Selectors.findAcceptedVerdict();
-    if (visible && !verdictWasVisible) {
-      armedAt = 0;
-      maybePrompt();
-    }
-    verdictWasVisible = visible;
-  }
+  window.addEventListener("message", (e) => {
+    if (e.source !== window || e.origin !== location.origin) return;
+    const d = e.data;
+    if (!d || d.source !== "leetcode-anki" || d.kind !== "verdict") return;
+    if (DEBUG) console.log("[la problem] verdict received →", d.status, "slug", d.slug);
+    if (d.status === "Accepted") maybePrompt(d.slug);
+  });
 
   // ---------- wiring ----------
 
@@ -633,11 +540,6 @@
       lastUrl = location.href;
       if (slug !== lastSlug) {
         lastSlug = slug;
-        promptedSlug = null;
-        verdictWasVisible = false;
-        failedWasVisible = false;
-        armedAt = 0; // a pending submission doesn't follow you to another problem
-        watchedSubmission = null;
         removeOverlay();
         renderPill();
         if (slug) queueDraftReset(slug);
@@ -654,7 +556,6 @@
         renderPill();
       }
       attemptDraftReset();
-      checkVerdict();
     }
   }
 

@@ -32,6 +32,12 @@
   "content_scripts": [
     {
       "matches": ["https://leetcode.com/*"],
+      "js": ["content/netwatch.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://leetcode.com/*"],
       "js": [
         "lib/sm2.js",
         "lib/select.js",
