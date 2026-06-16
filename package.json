@@ -3,6 +3,7 @@
   "version": "0.5.1",
   "description": "Spaced-repetition practice for LeetCode — Anki, but the cards are problems.",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "test": "node --test",
     "package": "node --test && mkdir -p builds && zip -r builds/leetcode-anki-$npm_package_version.zip manifest.json background.js content lib popup icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png"
