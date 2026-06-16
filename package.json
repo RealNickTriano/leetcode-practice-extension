@@ -1,6 +1,6 @@
 {
   "name": "leetcode-anki",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "description": "Spaced-repetition practice for LeetCode — Anki, but the cards are problems.",
   "private": true,
   "license": "MIT",
