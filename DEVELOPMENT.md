@@ -40,8 +40,22 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
 
 ## Try it
 
+### Chrome
+
 1. Open `chrome://extensions`, enable **Developer mode**.
 2. Click **Load unpacked** and select this directory.
+
+### Firefox
+
+Firefox loads a different manifest (`manifest.firefox.json`) — see
+[Cross-browser support](#cross-browser-support) for why.
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on…** and select `manifest.firefox.json`
+   (not `manifest.json`).
+
+Then, in either browser:
+
 3. Open any problem on LeetCode and click the **"⟳ + Add to Leetcode Anki"** pill
    (bottom-right). The card is due immediately.
 4. Visit <https://leetcode.com/problemset/> — the orange "Leetcode Anki · Due Today"
@@ -51,15 +65,44 @@ Full design doc: open [`PLAN.html`](PLAN.html) in a browser.
    is scheduled. The problemset card updates to the next due problem, or
    "all caught up".
 
+## Cross-browser support
+
+The same source runs on Chrome and Firefox; only the manifest and how the
+background loads differ.
+
+- **`manifest.json`** is the Chrome (Manifest V3) manifest. Its background is a
+  **service worker** that pulls in `lib/` with `importScripts`.
+- **`manifest.firefox.json`** is the Firefox manifest. Firefox runs the
+  background as an **event page** (a hidden DOM document, not a service worker),
+  so it lists the same files under `background.scripts` instead — `importScripts`
+  is unavailable there and `background.js` guards the call. It also adds the
+  required `browser_specific_settings.gecko` block.
+
+Two source files bridge the gap:
+
+- `background.js` only calls `importScripts` when it exists (Chrome).
+- `lib/store.js` must know when it's the background context (the one real store)
+  versus a content script / popup (a message-passing proxy). Chrome's service
+  worker has no `document`, which is the tell; Firefox's event page does, so
+  `lib/bg-context.js` (first in the Firefox `background.scripts`) sets an
+  explicit flag that `store.js` checks.
+
+`strict_min_version` is **128.0**: declarative `"world": "MAIN"` content scripts
+(used by `content/netwatch.js`) are only supported from Firefox 128.
+
 ## Releasing
 
 `npm run package` runs the full test suite and then builds
 `builds/leetcode-anki-<version>.zip` (a red test blocks the package). The zip
-contains exactly what the manifest references — `manifest.json` and
+contains exactly what the Chrome manifest references — `manifest.json` and
 `background.js` at the root, `content/`, `lib/`, `popup/`, and the four
 icon PNGs. Tests, docs, configs,
 the icon-source SVG, and `node_modules` are excluded; built zips are
 gitignored.
+
+`npm run package:firefox` does the same for Firefox, building
+`builds/leetcode-anki-firefox-<version>.zip` with `manifest.firefox.json`
+staged in as `manifest.json` at the zip root.
 
 Notes:
 
@@ -71,9 +114,18 @@ Notes:
   third-party trademarks), and have a justification ready for the
   `leetcode.com` host permission. Unlisted listings get the same review as
   public ones.
-- **Version bumps** — update `version` in both `manifest.json` and
-  `package.json` (keep them in sync); the zip name picks up the version
-  automatically.
+- **Version bumps** — update `version` in `manifest.json`,
+  `manifest.firefox.json`, and `package.json` (keep all three in sync); the zip
+  names pick up the version automatically.
+- **Firefox / AMO** — submit the `package:firefox` zip to
+  [addons.mozilla.org](https://addons.mozilla.org). Run `npx web-ext lint` over
+  a staged Firefox build first to catch manifest issues the way AMO review
+  will.
+  - ⚠️ **Set the add-on ID before the first submission.** `gecko.id` in
+    `manifest.firefox.json` is a placeholder (`leetcode-anki@CHANGEME.example.com`).
+    Replace it with the owner's address (e.g. `leetcode-anki@yourdomain`) — the
+    ID is permanent once published and ties the listing to the owner's AMO
+    account, so it shouldn't be guessed by a contributor.
 - Store listing copy lives in [`STORE.md`](STORE.md).
 
 ## Run the tests
@@ -88,8 +140,10 @@ runs under plain Node.
 ## Layout
 
 ```
-manifest.json            MV3 manifest
-background.js            service worker — owns all storage writes
+manifest.json            MV3 manifest (Chrome — service worker background)
+manifest.firefox.json    MV3 manifest (Firefox — event-page background)
+background.js            background — owns all storage writes
+lib/bg-context.js        flags the Firefox event page as the background context
 content/problemset.js    finds the problem list, injects the review card
 content/problem.js       add-to-deck pill, Accepted detection, rating overlay
 lib/sm2.js               SM-2: rate(card, grade) → card′

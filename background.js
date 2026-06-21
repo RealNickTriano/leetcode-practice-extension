@@ -3,7 +3,13 @@
 // (see lib/store.js), so read-modify-write operations from any number of
 // tabs serialize through one store instance — chrome.storage has no
 // transactions, and concurrent writers would clobber each other.
-importScripts("lib/sm2.js", "lib/store.js");
+// Chrome runs this as a service worker, where the lib modules must be pulled
+// in with importScripts. Firefox runs it as an event page and loads those same
+// files via the manifest's background.scripts array, so importScripts is absent
+// there — guard the call so this one file works under both browsers.
+if (typeof importScripts === "function") {
+  importScripts("lib/sm2.js", "lib/store.js");
+}
 
 const { store, settingsReady } = globalThis.LeetcodeAnki;
 const METHODS = new Set(Object.keys(store));
