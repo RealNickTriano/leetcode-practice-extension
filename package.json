@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "test": "node --test",
-    "package": "node --test && mkdir -p builds && zip -r builds/leetcode-anki-$npm_package_version.zip manifest.json background.js content lib popup icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png"
+    "package": "node --test && mkdir -p builds && zip -r builds/leetcode-anki-$npm_package_version.zip manifest.json background.js content lib popup icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png",
+    "package:firefox": "node --test && rm -rf builds/firefox-stage && mkdir -p builds/firefox-stage/icons builds && cp manifest.firefox.json builds/firefox-stage/manifest.json && cp background.js builds/firefox-stage/ && cp -r content lib popup builds/firefox-stage/ && cp icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png builds/firefox-stage/icons/ && (cd builds/firefox-stage && zip -r ../leetcode-anki-firefox-$npm_package_version.zip .) && rm -rf builds/firefox-stage"
   },
   "devDependencies": {
     "sharp": "^0.35.1"
